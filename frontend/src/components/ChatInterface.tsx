@@ -7,7 +7,7 @@
  * Author: AI Assistant
  */
 
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Bot, User, Volume2, VolumeX } from 'lucide-react'
 
 export interface ChatMessage {
@@ -86,10 +86,10 @@ function ChatInterface({
         className={`flex ${isExaminer ? 'justify-start' : 'justify-end'} mb-4`}
       >
         <div
-          className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-lg ${
+          className={`max-w-xs lg:max-w-md xl:max-w-lg px-5 py-4 rounded-2xl shadow-lg backdrop-blur-sm border transition-all duration-300 hover:shadow-xl transform hover:scale-105 ${
             isExaminer
-              ? 'bg-blue-100 text-blue-900 rounded-tl-none'
-              : 'bg-gray-100 text-gray-900 rounded-tr-none'
+              ? 'bg-blue-100/80 text-blue-900 rounded-tl-none border-blue-200/50'
+              : 'bg-gray-100/80 text-gray-900 rounded-tr-none border-gray-200/50'
           }`}
         >
           {/* Message header */}
@@ -107,7 +107,7 @@ function ChatInterface({
             
             {/* Audio control button */}
             {message.hasAudio && onPlayAudio && onStopAudio && (
-              <button
+                              <button
                 onClick={() => {
                   if (message.isPlaying) {
                     onStopAudio(message.id)
@@ -115,10 +115,10 @@ function ChatInterface({
                     onPlayAudio(message.id)
                   }
                 }}
-                className={`p-1 rounded-full transition-colors ${
+                className={`p-2 rounded-full transition-all duration-300 backdrop-blur-sm border shadow-md hover:shadow-lg transform hover:scale-110 ${
                   isExaminer
-                    ? 'hover:bg-blue-200 text-blue-600'
-                    : 'hover:bg-gray-200 text-gray-600'
+                    ? 'hover:bg-blue-200/60 text-blue-600 border-blue-200/50'
+                    : 'hover:bg-gray-200/60 text-gray-600 border-gray-200/50'
                 }`}
                 title={message.isPlaying ? 'Stop audio' : 'Play audio'}
               >
@@ -150,18 +150,20 @@ function ChatInterface({
    */
   const renderExaminerTyping = () => (
     <div className="flex justify-start mb-4">
-      <div className="bg-blue-100 text-blue-900 px-4 py-3 rounded-lg rounded-tl-none max-w-xs">
-        <div className="flex items-center space-x-2">
-          <Bot className="w-4 h-4 text-blue-600" />
-          <span className="text-xs font-medium">Examiner</span>
-          <Volume2 className="w-3 h-3 animate-pulse text-blue-600" />
+      <div className="bg-blue-100/80 backdrop-blur-sm text-blue-900 px-5 py-4 rounded-2xl rounded-tl-none max-w-xs shadow-lg border border-blue-200/50 animate-pulse">
+        <div className="flex items-center space-x-3">
+          <div className="p-1 bg-blue-200/50 rounded-full">
+            <Bot className="w-5 h-5 text-blue-600" />
+          </div>
+          <span className="text-sm font-semibold">Examiner</span>
+          <Volume2 className="w-4 h-4 animate-pulse text-blue-600" />
         </div>
-        <div className="text-sm mt-2 flex items-center space-x-1">
-          <span>Speaking</span>
+        <div className="text-sm mt-3 flex items-center space-x-2">
+          <span className="font-medium">Speaking</span>
           <div className="flex space-x-1">
-            <div className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-1 h-1 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce shadow-sm" style={{ animationDelay: '300ms' }} />
           </div>
         </div>
       </div>
@@ -173,13 +175,15 @@ function ChatInterface({
    */
   const renderStudentRecording = () => (
     <div className="flex justify-end mb-4">
-      <div className="bg-red-100 text-red-900 px-4 py-3 rounded-lg rounded-tr-none max-w-xs">
-        <div className="flex items-center space-x-2">
-          <User className="w-4 h-4 text-red-600" />
-          <span className="text-xs font-medium">Student</span>
-          <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
+      <div className="bg-red-100/80 backdrop-blur-sm text-red-900 px-5 py-4 rounded-2xl rounded-tr-none max-w-xs shadow-lg border border-red-200/50 animate-pulse">
+        <div className="flex items-center space-x-3">
+          <div className="p-1 bg-red-200/50 rounded-full">
+            <User className="w-5 h-5 text-red-600" />
+          </div>
+          <span className="text-sm font-semibold">Student</span>
+          <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse shadow-lg" />
         </div>
-        <div className="text-sm mt-2">
+        <div className="text-sm mt-3 font-medium">
           Recording your response...
         </div>
       </div>
@@ -188,15 +192,17 @@ function ChatInterface({
 
   return (
     <div 
-      className={`flex flex-col h-full bg-white border border-gray-200 rounded-lg ${className}`}
+      className={`flex flex-col h-full bg-white/90 backdrop-blur-sm border border-white/30 rounded-2xl shadow-lg ${className}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
-        <h3 className="text-lg font-semibold text-gray-900">
+      <div className="flex items-center justify-between p-6 border-b border-white/30 bg-gray-50/60 backdrop-blur-sm rounded-t-2xl">
+        <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Exam Conversation
         </h3>
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <span>{messages.length} messages</span>
+        <div className="flex items-center space-x-3 text-sm text-gray-600">
+          <div className="px-3 py-1 bg-white/50 rounded-full backdrop-blur-sm border border-white/40">
+            <span className="font-medium">{messages.length} messages</span>
+          </div>
         </div>
       </div>
 
@@ -208,13 +214,17 @@ function ChatInterface({
       >
         {/* Welcome message if no messages yet */}
         {messages.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
-            <Bot className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-lg font-medium mb-2">Welcome to your oral exam</p>
-            <p className="text-sm">
-              Click the microphone button to start the exam.
-              The examiner will read each question aloud.
-            </p>
+          <div className="text-center text-gray-500 py-12">
+            <div className="p-6 bg-blue-100/60 backdrop-blur-sm rounded-2xl border border-blue-200/50 shadow-lg mx-auto max-w-md">
+              <div className="p-4 bg-white/60 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                <Bot className="w-12 h-12 text-blue-600" />
+              </div>
+              <p className="text-xl font-bold text-gray-800 mb-4">Welcome to your oral exam</p>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Click the microphone button to start the exam.
+                The examiner will read each question aloud.
+              </p>
+            </div>
           </div>
         )}
 
@@ -230,29 +240,29 @@ function ChatInterface({
       </div>
 
       {/* Status bar */}
-      <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+      <div className="px-6 py-4 border-t border-white/30 bg-gray-50/60 backdrop-blur-sm rounded-b-2xl">
         <div className="flex items-center justify-between text-xs text-gray-600">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {isExaminerSpeaking && (
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-2 px-3 py-1 bg-blue-100/60 rounded-full backdrop-blur-sm border border-blue-200/50">
                 <Volume2 className="w-3 h-3 animate-pulse text-blue-600" />
-                <span>Examiner speaking</span>
+                <span className="font-medium">Examiner speaking</span>
               </div>
             )}
             {isStudentRecording && (
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-2 px-3 py-1 bg-red-100/60 rounded-full backdrop-blur-sm border border-red-200/50">
                 <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
-                <span>Recording student response</span>
+                <span className="font-medium">Recording student response</span>
               </div>
             )}
-            {!isExaminerSpeaking && !isStudentRecording && (
-              <span>Ready for interaction</span>
-            )}
+
           </div>
           
           <div className="text-right">
             {messages.length > 0 && (
-              <span>Last message at {formatTime(messages[messages.length - 1]?.timestamp)}</span>
+              <div className="px-3 py-1 bg-white/50 rounded-full backdrop-blur-sm border border-white/40">
+                <span className="font-medium">Last: {formatTime(messages[messages.length - 1]?.timestamp)}</span>
+              </div>
             )}
           </div>
         </div>

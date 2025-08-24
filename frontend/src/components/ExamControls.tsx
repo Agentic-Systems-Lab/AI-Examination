@@ -7,8 +7,7 @@
  * Author: AI Assistant
  */
 
-import React from 'react'
-import { Play, Square, SkipForward, CheckCircle, Clock, BookOpen, User } from 'lucide-react'
+import { Play, SkipForward, CheckCircle, Clock, BookOpen } from 'lucide-react'
 
 interface ExamControlsProps {
   /** Current exam session status */
@@ -109,46 +108,54 @@ function ExamControls({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
+    <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8 space-y-8 hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-3xl">
       {/* Exam header */}
-      <div className="text-center border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="text-center border-b border-white/30 pb-6">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent mb-3">
           Oral Examination
         </h2>
         {materialTitle && (
-          <div className="flex items-center justify-center space-x-2 text-gray-600">
-            <BookOpen className="w-4 h-4" />
-            <span className="text-sm">{materialTitle}</span>
+          <div className="flex items-center justify-center space-x-3 text-gray-600">
+            <div className="p-2 bg-blue-100/50 rounded-full backdrop-blur-sm">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+            </div>
+            <span className="text-base font-medium">{materialTitle}</span>
           </div>
         )}
       </div>
 
       {/* Status and progress */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Current status */}
-        <div className="text-center">
-          <div className="text-2xl font-bold mb-1">
-            <span className={getStatusColor(examStatus)}>
-              {examStatus.replace('_', ' ').toUpperCase()}
-            </span>
+        <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-white/30 shadow-lg hover:bg-white/80 transition-all duration-300">
+          <div className="mb-3">
+            <div className="text-lg font-semibold text-gray-700 mb-1">Status</div>
+            <div className="text-2xl font-bold">
+              <span className={getStatusColor(examStatus)}>
+                {examStatus.replace('_', ' ').charAt(0).toUpperCase() + examStatus.replace('_', ' ').slice(1).toLowerCase()}
+              </span>
+            </div>
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 font-medium bg-gray-50/60 backdrop-blur-sm rounded-lg px-3 py-2">
             {getCurrentActivity()}
           </div>
         </div>
 
         {/* Progress */}
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900 mb-1">
-            {currentQuestionNumber}/{totalQuestions}
+        <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-white/30 shadow-lg hover:bg-white/80 transition-all duration-300">
+          <div className="mb-3">
+            <div className="text-lg font-semibold text-gray-700 mb-1">Progress</div>
+            <div className="text-2xl font-bold text-gray-900">
+              {currentQuestionNumber}/{totalQuestions}
+            </div>
           </div>
-          <div className="text-sm text-gray-600">
-            Questions ({progressPercentage}% complete)
+          <div className="text-sm text-gray-600 font-medium bg-gray-50/60 backdrop-blur-sm rounded-lg px-3 py-2 mb-3">
+            Questions • {progressPercentage}% Complete
           </div>
           {totalQuestions > 0 && (
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+            <div className="w-full bg-gray-200/60 backdrop-blur-sm rounded-full h-3 shadow-inner">
               <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 shadow-lg"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -156,28 +163,33 @@ function ExamControls({
         </div>
 
         {/* Duration */}
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900 mb-1">
-            {formatDuration(examDuration)}
+        <div className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-white/30 shadow-lg hover:bg-white/80 transition-all duration-300">
+          <div className="mb-3">
+            <div className="text-lg font-semibold text-gray-700 mb-1">Duration</div>
+            <div className="text-2xl font-bold text-gray-900 font-mono">
+              {formatDuration(examDuration)}
+            </div>
           </div>
-          <div className="text-sm text-gray-600 flex items-center justify-center space-x-1">
-            <Clock className="w-3 h-3" />
-            <span>Duration</span>
+          <div className="text-sm text-gray-600 font-medium bg-gray-50/60 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center justify-center space-x-2">
+            <div className="p-1 bg-gray-100/50 rounded-full backdrop-blur-sm">
+              <Clock className="w-3 h-3" />
+            </div>
+            <span>Elapsed Time</span>
           </div>
         </div>
       </div>
 
       {/* Control buttons */}
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-4">
         {examStatus === 'not_started' && (
           <button
             onClick={onStartExam}
             disabled={!canStartExam || disabled}
-            className="flex items-center space-x-2 px-6 py-3 bg-green-600 hover:bg-green-700 
-                     disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg 
-                     font-medium transition-colors shadow-md hover:shadow-lg"
+            className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 
+                     disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl 
+                     font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 backdrop-blur-sm border border-white/20"
           >
-            <Play className="w-5 h-5" />
+            <Play className="w-6 h-6" />
             <span>Start Exam</span>
           </button>
         )}
@@ -189,11 +201,11 @@ function ExamControls({
               <button
                 onClick={onSkipQuestion}
                 disabled={disabled || isRecording || isExaminerSpeaking}
-                className="flex items-center space-x-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 
-                         disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg 
-                         transition-colors"
+                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 
+                         disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl 
+                         font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 backdrop-blur-sm border border-white/20"
               >
-                <SkipForward className="w-4 h-4" />
+                <SkipForward className="w-5 h-5" />
                 <span>Skip</span>
               </button>
             )}
@@ -202,11 +214,11 @@ function ExamControls({
             <button
               onClick={onCompleteExam}
               disabled={disabled || isRecording || isExaminerSpeaking}
-              className="flex items-center space-x-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 
-                       disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg 
-                       font-medium transition-colors shadow-md hover:shadow-lg"
+              className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 
+                       disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl 
+                       font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 backdrop-blur-sm border border-white/20"
             >
-              <CheckCircle className="w-5 h-5" />
+              <CheckCircle className="w-6 h-6" />
               <span>Complete Exam</span>
             </button>
           </>
@@ -216,63 +228,17 @@ function ExamControls({
           <button
             onClick={onRestartExam}
             disabled={disabled}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 
-                     disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg 
-                     font-medium transition-colors shadow-md hover:shadow-lg"
+            className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 
+                     disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl 
+                     font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 backdrop-blur-sm border border-white/20"
           >
-            <Play className="w-5 h-5" />
+            <Play className="w-6 h-6" />
             <span>Start New Exam</span>
           </button>
         )}
       </div>
 
-      {/* Activity indicators */}
-      {(examStatus === 'started' || examStatus === 'in_progress') && (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center justify-center space-x-6 text-sm">
-            {/* Examiner status */}
-            <div className={`flex items-center space-x-2 ${
-              isExaminerSpeaking ? 'text-blue-600' : 'text-gray-400'
-            }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                isExaminerSpeaking ? 'bg-blue-600 animate-pulse' : 'bg-gray-400'
-              }`} />
-              <span>Examiner</span>
-            </div>
 
-            {/* Student status */}
-            <div className={`flex items-center space-x-2 ${
-              isRecording ? 'text-red-600' : isTranscribing ? 'text-yellow-600' : 'text-gray-400'
-            }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                isRecording 
-                  ? 'bg-red-600 animate-pulse' 
-                  : isTranscribing 
-                    ? 'bg-yellow-600 animate-spin' 
-                    : 'bg-gray-400'
-              }`} />
-              <User className="w-3 h-3" />
-              <span>
-                {isRecording ? 'Recording' : isTranscribing ? 'Processing' : 'Ready'}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Instructions */}
-      {examStatus === 'not_started' && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-2">Instructions:</h4>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Click "Start Exam" to begin</li>
-            <li>• The examiner will read each question aloud</li>
-            <li>• Use the microphone to record your answers</li>
-            <li>• The system will detect when you stop speaking</li>
-            <li>• You can complete the exam at any time</li>
-          </ul>
-        </div>
-      )}
     </div>
   )
 }

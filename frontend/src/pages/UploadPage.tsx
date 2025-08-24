@@ -232,27 +232,37 @@ function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Study Materials
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload and manage your study materials for AI-powered examinations. 
-            Supports PDF, DOCX, and TXT files up to 10MB.
-          </p>
-        </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 animate-gradient-shift"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-50/30 to-purple-50/50 animate-gradient-pulse"></div>
+      
+      {/* Floating Geometric Shapes */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-float-slow"></div>
+      <div className="absolute top-40 right-20 w-48 h-48 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-2xl animate-float-slower"></div>
+      <div className="absolute bottom-40 left-1/4 w-24 h-24 bg-gradient-to-br from-indigo-400/25 to-blue-400/25 rounded-full blur-lg animate-float"></div>
+
+      <div className="relative z-10 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Page Header */}
+          <div className="text-center mb-12 animate-slide-up">
+            <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent mb-6">
+              Study Materials
+            </h1>
+            <p className="text-xl lg:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-light">
+              Upload and manage your study materials for AI-powered examinations. 
+              Supports PDF, DOCX, and TXT files up to 10MB.
+            </p>
+          </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Upload Section */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 h-fit">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-8 h-fit hover:bg-white/90 transition-all duration-300">
             <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-xl">📁</span>
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mr-4 shadow-xl">
+                <span className="text-xl text-white">📁</span>
               </div>
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 to-blue-700 bg-clip-text text-transparent">
                 Upload New Material
               </h2>
             </div>
@@ -361,13 +371,13 @@ function UploadPage() {
           </div>
 
           {/* Materials List */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-8 hover:bg-white/90 transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-xl">📚</span>
+                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-2xl flex items-center justify-center mr-4 shadow-xl">
+                  <span className="text-xl text-white">📚</span>
                 </div>
-                <h2 className="text-2xl font-semibold text-gray-900">
+                <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-800 to-green-700 bg-clip-text text-transparent">
                   Your Materials
                 </h2>
               </div>
@@ -391,14 +401,17 @@ function UploadPage() {
                 {materials.map((material) => (
                   <div
                     key={material.id}
-                    className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-primary-300 transition-all duration-200"
+                    className="group bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/90 hover:shadow-3xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden"
                   >
+                    {/* Gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-purple-400/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
                     {/* Header Section */}
-                    <div className="mb-6">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <div className="mb-6 relative z-10">
+                      <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-700 bg-clip-text text-transparent mb-2 group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300">
                         {material.title}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
                         Uploaded: {new Date(material.upload_time).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'short',
@@ -408,10 +421,10 @@ function UploadPage() {
                     </div>
 
                     {/* Action Buttons Section */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
                       <button
                         onClick={() => handleStartExam(material)}
-                        className="btn-primary py-3 px-4 text-sm font-semibold flex items-center justify-center space-x-2 rounded-lg shadow-sm hover:shadow-md transition-all"
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-4 text-sm font-semibold flex items-center justify-center space-x-2 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                         disabled={isGeneratingQuestions}
                       >
                         <span className="text-lg">🎯</span>
@@ -420,7 +433,7 @@ function UploadPage() {
                       
                       <button
                         onClick={() => handleGenerateQuestions(material)}
-                        className="btn-secondary py-3 px-4 text-sm font-semibold flex items-center justify-center space-x-2 rounded-lg shadow-sm hover:shadow-md transition-all"
+                        className="bg-white/80 backdrop-blur-sm border border-gray-300 text-gray-700 hover:bg-white hover:border-blue-300 py-3 px-4 text-sm font-semibold flex items-center justify-center space-x-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                         disabled={isGeneratingQuestions}
                       >
                         {isGeneratingQuestions ? (
@@ -438,7 +451,7 @@ function UploadPage() {
                       
                       <button
                         onClick={() => handleViewQuestions(material)}
-                        className="btn-secondary py-3 px-4 text-sm font-semibold flex items-center justify-center space-x-2 rounded-lg shadow-sm hover:shadow-md transition-all"
+                        className="bg-white/80 backdrop-blur-sm border border-gray-300 text-gray-700 hover:bg-white hover:border-green-300 py-3 px-4 text-sm font-semibold flex items-center justify-center space-x-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                         disabled={isGeneratingQuestions}
                       >
                         <span className="text-lg">📝</span>
@@ -447,7 +460,7 @@ function UploadPage() {
                       
                       <button
                         onClick={() => handleDeleteMaterial(material)}
-                        className="btn-secondary py-3 px-4 text-sm font-semibold bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:border-red-300 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center space-x-2"
+                        className="bg-red-50/80 backdrop-blur-sm text-red-600 border border-red-200 hover:bg-red-100 hover:border-red-300 py-3 px-4 text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
                         disabled={isGeneratingQuestions || isDeleting}
                       >
                         <span className="text-lg">🗑️</span>
@@ -473,9 +486,9 @@ function UploadPage() {
 
         {/* Question Generation Modal */}
         {showQuestionModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-semibold mb-4">Generate Questions</h3>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-8 max-w-md w-full mx-4">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-blue-700 bg-clip-text text-transparent mb-6">Generate Questions</h3>
               
               <div className="space-y-4">
                 <div>
@@ -599,11 +612,11 @@ function UploadPage() {
 
         {/* Delete Confirmation Dialog */}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-white/20 shadow-2xl p-8 max-w-md w-full mx-4">
               <div className="text-center">
-                <div className="text-6xl mb-4">⚠️</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <div className="text-6xl mb-6">⚠️</div>
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-red-700 bg-clip-text text-transparent mb-4">
                   Confirm Deletion
                 </h3>
                 <p className="text-gray-600 mb-4">
@@ -642,89 +655,81 @@ function UploadPage() {
         )}
 
         {/* Help Section */}
-        <div className="mt-12">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 shadow-sm p-8">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">💡</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Tips for Better Results</h3>
-              <p className="text-gray-600">Follow these guidelines to maximize your AI examination experience</p>
+        <div className="mt-16">
+          <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-3xl border border-white/20 shadow-2xl p-12 overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute top-0 left-0 w-full h-full opacity-30">
+              <div className="absolute top-10 right-10 w-32 h-32 bg-gradient-to-br from-blue-300/20 to-purple-300/20 rounded-full blur-2xl"></div>
+              <div className="absolute bottom-10 left-10 w-24 h-24 bg-gradient-to-br from-purple-300/20 to-pink-300/20 rounded-full blur-xl"></div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-white rounded-lg p-6 border border-blue-100 shadow-sm">
-                <div className="flex items-center mb-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <span className="text-blue-600">📄</span>
+            <div className="relative z-10">
+              <div className="text-center mb-12">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                  <span className="text-3xl text-white">💡</span>
+                </div>
+                <h3 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 via-blue-700 to-purple-700 bg-clip-text text-transparent mb-4">Tips for Better Results</h3>
+                <p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed font-light">Follow these guidelines to maximize your AI examination experience</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div className="group bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-xl hover:shadow-2xl hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center mr-4 shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                      <span className="text-xl text-white">📄</span>
+                    </div>
+                    <h4 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-blue-700 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300">File Preparation</h4>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">File Preparation</h4>
+                  <ul className="space-y-4 text-gray-700">
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Use clear, well-structured documents with proper headings</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Include key concepts, definitions, and examples</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Ensure content is at least 500 words for quality questions</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Keep files under 5MB for optimal performance</span>
+                    </li>
+                  </ul>
                 </div>
-                <ul className="space-y-3 text-sm text-gray-600">
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Use clear, well-structured documents with proper headings</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Include key concepts, definitions, and examples</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Ensure content is at least 500 words for quality questions</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Keep files under 5MB for optimal performance</span>
-                  </li>
-                </ul>
-              </div>
 
-              <div className="bg-white rounded-lg p-6 border border-blue-100 shadow-sm">
-                <div className="flex items-center mb-4">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                    <span className="text-green-600">🎯</span>
+                <div className="group bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-xl hover:shadow-2xl hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-700 rounded-2xl flex items-center justify-center mr-4 shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                      <span className="text-xl text-white">🎯</span>
+                    </div>
+                    <h4 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-green-700 bg-clip-text text-transparent group-hover:from-green-700 group-hover:to-emerald-700 transition-all duration-300">Content Guidelines</h4>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">Content Guidelines</h4>
+                  <ul className="space-y-4 text-gray-700">
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Focus on key learning objectives and outcomes</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Include detailed explanations for better question quality</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Use academic or professional content for best results</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <span className="text-green-500 mt-1.5 font-bold text-lg">•</span>
+                      <span className="leading-relaxed">Organize content with clear sections and topics</span>
+                    </li>
+                  </ul>
                 </div>
-                <ul className="space-y-3 text-sm text-gray-600">
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Focus on key learning objectives and outcomes</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Include detailed explanations for better question quality</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Use academic or professional content for best results</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1 font-bold">•</span>
-                    <span>Organize content with clear sections and topics</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* API Key Notice */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-amber-600">🔑</span>
-                </div>
-                <h4 className="text-lg font-semibold text-amber-800">OpenAI API Key Required</h4>
-              </div>
-              <p className="text-sm text-amber-700 mb-3">
-                To generate questions and provide AI-powered scoring, ensure your OpenAI API key is configured in the backend environment:
-              </p>
-              <div className="bg-amber-100 rounded-lg p-3 font-mono text-xs text-amber-800">
-                <div className="text-amber-600 mb-1"># backend/.env</div>
-                <div>OPENAI_API_KEY=your_api_key_here</div>
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

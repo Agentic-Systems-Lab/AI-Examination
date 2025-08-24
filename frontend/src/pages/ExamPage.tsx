@@ -665,10 +665,18 @@ function ExamPage() {
 
   if (!audioConfig) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Animated Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-50/30 to-purple-50/50 animate-gradient-pulse"></div>
+        
+        {/* Floating Shapes */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-float-slow"></div>
+        <div className="absolute bottom-20 right-20 w-48 h-48 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-2xl animate-float-slower"></div>
+        
+        <div className="relative z-10 bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-12 text-center transform hover:scale-105 transition-all duration-300">
           <LoadingSpinner size="large" />
-          <p className="mt-4 text-gray-600">Loading audio configuration...</p>
+          <p className="mt-6 text-gray-700 font-semibold text-lg">Loading audio configuration...</p>
         </div>
       </div>
     )
@@ -676,11 +684,19 @@ function ExamPage() {
 
   if (isLoadingQuestions) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Animated Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-50/30 to-purple-50/50 animate-gradient-pulse"></div>
+        
+        {/* Floating Shapes */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-float-slow"></div>
+        <div className="absolute bottom-20 right-20 w-48 h-48 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-2xl animate-float-slower"></div>
+        
+        <div className="relative z-10 bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-12 text-center transform hover:scale-105 transition-all duration-300">
           <LoadingSpinner size="large" />
-          <p className="mt-4 text-gray-600">Loading questions for {materialTitle}...</p>
-          {questionsError && <p className="mt-2 text-red-600">{questionsError}</p>}
+          <p className="mt-6 text-gray-700 font-semibold text-lg">Loading questions for {materialTitle}...</p>
+          {questionsError && <p className="mt-4 text-red-600 font-medium">{questionsError}</p>}
         </div>
       </div>
     )
@@ -688,21 +704,29 @@ function ExamPage() {
 
   if (questionsError && !isLoadingQuestions) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-red-600 text-6xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Animated Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-100 animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-red-50/30 to-orange-50/50 animate-gradient-pulse"></div>
+        
+        {/* Floating Shapes */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-red-400/20 to-orange-400/20 rounded-full blur-xl animate-float-slow"></div>
+        <div className="absolute bottom-20 right-20 w-48 h-48 bg-gradient-to-br from-orange-400/15 to-yellow-400/15 rounded-full blur-2xl animate-float-slower"></div>
+        
+        <div className="relative z-10 bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl max-w-lg mx-auto p-10 text-center transform hover:scale-105 transition-all duration-300">
+          <div className="text-red-600 text-6xl mb-6">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Unable to Load Questions
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 mb-8 leading-relaxed">
             {questionsError}
           </p>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <button
               onClick={loadQuestions}
               disabled={isLoadingQuestions}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                        disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 
+                        disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
             >
               {isLoadingQuestions ? (
                 <>
@@ -715,7 +739,7 @@ function ExamPage() {
             </button>
             <button
               onClick={() => navigate('/upload')}
-              className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              className="w-full px-6 py-3 bg-gray-100/80 backdrop-blur-sm text-gray-700 rounded-xl hover:bg-gray-200/80 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-white/50"
             >
               Go to Upload Page
             </button>
@@ -727,18 +751,26 @@ function ExamPage() {
 
   if (questions.length === 0 && !isLoadingQuestions) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-gray-400 text-6xl mb-4">📄</div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Animated Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 animate-gradient-shift"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-gray-50/30 to-blue-50/50 animate-gradient-pulse"></div>
+        
+        {/* Floating Shapes */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-gray-400/20 to-blue-400/20 rounded-full blur-xl animate-float-slow"></div>
+        <div className="absolute bottom-20 right-20 w-48 h-48 bg-gradient-to-br from-blue-400/15 to-indigo-400/15 rounded-full blur-2xl animate-float-slower"></div>
+        
+        <div className="relative z-10 bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl max-w-lg mx-auto p-10 text-center transform hover:scale-105 transition-all duration-300">
+          <div className="text-gray-400 text-6xl mb-6">📄</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             No Questions Available
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 mb-8 leading-relaxed">
             No questions were found for {materialTitle}. Please generate questions first.
           </p>
           <button
             onClick={() => navigate('/upload')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
           >
             Go to Upload Page
           </button>
@@ -750,19 +782,28 @@ function ExamPage() {
   // ====================== MAIN RENDER ======================
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 animate-gradient-shift"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-50/30 to-purple-50/50 animate-gradient-pulse"></div>
+      
+      {/* Floating Geometric Shapes */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-float-slow"></div>
+      <div className="absolute top-40 right-20 w-48 h-48 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-2xl animate-float-slower"></div>
+      <div className="absolute bottom-40 left-1/4 w-24 h-24 bg-gradient-to-br from-indigo-400/25 to-blue-400/25 rounded-full blur-lg animate-float"></div>
+
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-white/20 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-600 font-medium">
                 Duration: {formatTime(examState.duration)}
               </div>
-              <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                examState.status === 'completed' ? 'bg-green-100 text-green-800' :
-                examState.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                'bg-gray-100 text-gray-800'
+              <div className={`px-4 py-2 rounded-full text-xs font-semibold shadow-md backdrop-blur-sm border border-white/20 ${
+                examState.status === 'completed' ? 'bg-green-100/80 text-green-800 border-green-200/50' :
+                examState.status === 'in_progress' ? 'bg-blue-100/80 text-blue-800 border-blue-200/50' :
+                'bg-gray-100/80 text-gray-800 border-gray-200/50'
               }`}>
                 {examState.status.replace('_', ' ').toUpperCase()}
               </div>
@@ -772,13 +813,13 @@ function ExamPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* Left Column - Conversation & Voice Interface */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Exam Conversation */}
-            <div className="bg-white border border-gray-200 rounded-lg">
+            <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-3xl">
               <ChatInterface
                 messages={chatMessages}
                 className="h-96 p-0"
@@ -786,30 +827,30 @@ function ExamPage() {
             </div>
 
             {/* Answer Input - Voice or Text */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8 hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-3xl">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   Your Answer
                 </h3>
                 
                 {/* Input Mode Toggle */}
-                <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+                <div className="flex items-center space-x-2 bg-gray-100/60 backdrop-blur-sm rounded-xl p-1 border border-white/30 shadow-lg">
                   <button
                     onClick={() => setInputMode('voice')}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                       inputMode === 'voice'
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-800'
+                        ? 'bg-white/90 text-blue-600 shadow-md backdrop-blur-sm border border-white/50'
+                        : 'text-gray-600 hover:text-gray-800 hover:bg-white/40'
                     }`}
                   >
                     🎤 Voice
                   </button>
                   <button
                     onClick={() => setInputMode('text')}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                       inputMode === 'text'
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-800'
+                        ? 'bg-white/90 text-blue-600 shadow-md backdrop-blur-sm border border-white/50'
+                        : 'text-gray-600 hover:text-gray-800 hover:bg-white/40'
                     }`}
                   >
                     ⌨️ Text
@@ -849,7 +890,7 @@ function ExamPage() {
                     }}
                     placeholder="Type your answer here... (Ctrl+Enter to submit)"
                     disabled={examState.status === 'not_started' || examState.status === 'completed' || isSubmittingText}
-                    className="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:text-gray-500"
+                    className="w-full h-32 p-4 bg-white/60 backdrop-blur-sm border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-300 resize-none disabled:bg-gray-100/50 disabled:text-gray-500 shadow-lg transition-all duration-300 focus:bg-white/80"
                   />
                   
                   <div className="flex items-center justify-between">
@@ -865,7 +906,7 @@ function ExamPage() {
                         examState.status === 'completed' || 
                         isSubmittingText
                       }
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
+                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold backdrop-blur-sm border border-white/20"
                     >
                       {isSubmittingText ? (
                         <>
@@ -885,9 +926,12 @@ function ExamPage() {
               
               {/* Current Question Display */}
               {currentQuestionText && examState.status !== 'completed' && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">Current Question:</h4>
-                  <p className="text-blue-800 text-sm">
+                <div className="mt-6 p-6 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl shadow-lg">
+                  <h4 className="font-semibold text-blue-900 mb-3 flex items-center">
+                    <span className="mr-2">💭</span>
+                    Current Question:
+                  </h4>
+                  <p className="text-blue-800 leading-relaxed">
                     {currentQuestionText}
                   </p>
                 </div>
@@ -915,16 +959,20 @@ function ExamPage() {
 
             {/* View Transcript Button */}
             {examState.status === 'completed' && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Exam Results</h3>
+              <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8 hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-3xl">
+                <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                  <span className="mr-3">🎯</span>
+                  Exam Results
+                </h3>
                 <button
                   onClick={() => setShowConversationLog(true)}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 shadow-lg"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl backdrop-blur-sm border border-white/20"
                 >
                   📋 View Exam Transcript
                 </button>
                 {conversationLogPath && (
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="text-sm text-gray-600 mt-3 flex items-center">
+                    <span className="mr-2">💾</span>
                     Saved to: {conversationLogPath}
                   </p>
                 )}
@@ -933,16 +981,16 @@ function ExamPage() {
 
             {/* Session Status */}
             {isCreatingSession && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl p-6 shadow-lg">
                 <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                  <span className="text-blue-800 font-medium">Creating exam session...</span>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+                  <span className="text-blue-800 font-semibold">Creating exam session...</span>
                 </div>
               </div>
             )}
 
             {/* Session Progress */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8 hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-3xl">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Session Progress</h3>
               
               <div className="space-y-4">
@@ -975,19 +1023,36 @@ function ExamPage() {
             </div>
 
             {/* Help Panel */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4">How to Use</h3>
-              <ul className="space-y-2 text-sm text-blue-800">
-                <li>• Click "Start Exam" to begin</li>
-                <li>• Listen to the examiner read each question</li>
-                <li>• Choose your input method:</li>
-                <li className="ml-4">
-                  <strong>🎤 Voice:</strong> Click the microphone to record your answer
+            <div className="bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl shadow-2xl p-8 hover:bg-blue-50/90 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-3xl">
+              <h3 className="text-xl font-bold text-blue-900 mb-6 flex items-center">
+                <span className="mr-3">💡</span>
+                How to Use
+              </h3>
+              <ul className="space-y-3 text-sm text-blue-800">
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-600">🚀</span>
+                  Click "Start Exam" to begin
                 </li>
-                <li className="ml-4">
-                  <strong>⌨️ Text:</strong> Type your answer and click "Submit Answer" or press Ctrl+Enter
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-600">👂</span>
+                  Listen to the examiner read each question
                 </li>
-                <li>• Your response will be processed and the next question will be read</li>
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-600">🎯</span>
+                  Choose your input method:
+                </li>
+                <li className="ml-6 flex items-start">
+                  <span className="mr-2 text-blue-600">🎤</span>
+                  <strong>Voice:</strong> Click the microphone to record your answer
+                </li>
+                <li className="ml-6 flex items-start">
+                  <span className="mr-2 text-blue-600">⌨️</span>
+                  <strong>Text:</strong> Type your answer and click "Submit Answer" or press Ctrl+Enter
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-600">⚡</span>
+                  Your response will be processed and the next question will be read
+                </li>
               </ul>
             </div>
           </div>
