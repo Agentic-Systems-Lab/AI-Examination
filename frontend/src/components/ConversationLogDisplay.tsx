@@ -137,20 +137,20 @@ function ConversationLogDisplay({ sessionId, logFilePath, isVisible, onClose }: 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 flex-shrink-0">
           <div className="flex justify-between items-center">
-            <div>
+            <div className="min-w-0">
               <h2 className="text-2xl font-bold mb-2">Exam Conversation Log</h2>
               <p className="text-blue-100">Session ID: {sessionId}</p>
               {logFilePath && (
-                <p className="text-blue-100 text-sm mt-1">Saved to: {logFilePath}</p>
+                <p className="text-blue-100 text-sm mt-1 break-words">Saved to: {logFilePath}</p>
               )}
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-blue-200 text-2xl font-bold"
+              className="text-white hover:text-blue-200 text-2xl font-bold hidden md:block"
             >
               ×
             </button>
@@ -158,7 +158,7 @@ function ConversationLogDisplay({ sessionId, logFilePath, isVisible, onClose }: 
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="overflow-y-auto flex-1 min-h-0">
           {isLoading && (
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -316,7 +316,7 @@ function ConversationLogDisplay({ sessionId, logFilePath, isVisible, onClose }: 
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex-shrink-0">
           <div className="flex justify-end">
             <button
               onClick={onClose}

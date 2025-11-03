@@ -11,7 +11,7 @@ import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useNavigate } from 'react-router-dom'
 import { useExamContext } from '../contexts/ExamContext'
-import { uploadMaterial, isValidFileType, formatFileSize, getFileTypeDisplayName } from '../services/examAPI'
+import { uploadMaterial, isValidFileType, formatFileSize, getFileTypeDisplayName, getQuestionCount } from '../services/examAPI'
 import LoadingSpinner from '../components/LoadingSpinner'
 import QuestionsPopup from '../components/QuestionsPopup'
 import toast from 'react-hot-toast'
@@ -42,6 +42,7 @@ function UploadPage() {
   // Questions popup state
   const [showQuestionsPopup, setShowQuestionsPopup] = useState(false)
   const [questionsPopupMaterial, setQuestionsPopupMaterial] = useState<any>(null)
+  const [shouldStartExam, setShouldStartExam] = useState(false)
 
   // Delete confirmation state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -152,15 +153,24 @@ function UploadPage() {
       
       if (success) {
         toast.success(`${questionCount} questions generated successfully!`)
+
+        // If shouldStartExam, start the exam immediately
+        if (shouldStartExam) {
+          setShouldStartExam(false)
+          handleStartExam(selectedMaterial)
+        }
+
         setShowQuestionModal(false)
         setSelectedMaterial(null)
         setCustomQuestionCount('10') // Reset to default
       } else {
         toast.error('Failed to generate questions. Please check your OpenAI API key.')
+        setShouldStartExam(false)
       }
     } catch (error) {
       console.error('Question generation failed:', error)
       toast.error('Failed to generate questions. Please try again.')
+      setShouldStartExam(false)
     }
   }
 
@@ -175,6 +185,14 @@ function UploadPage() {
   // Handle material selection for exam
   const handleStartExam = async (material: any) => {
     try {
+      // Check if the material has questions
+      const questionCount = await getQuestionCount(material.id)
+      if (questionCount.total_questions === 0 && !shouldStartExam) {
+        setShouldStartExam(true)
+        handleGenerateQuestions(material)
+        return
+      }
+
       selectMaterial(material)
       const success = await startExam(material.id)
       
@@ -570,7 +588,9 @@ function UploadPage() {
                 <button
                   onClick={() => {
                     setShowQuestionModal(false)
+                    setSelectedMaterial(null)
                     setCustomQuestionCount('10') // Reset to default
+                    setShouldStartExam(false)
                   }}
                   className="btn-secondary flex-1"
                   disabled={isGeneratingQuestions}
@@ -606,7 +626,11 @@ function UploadPage() {
         {/* Questions Popup */}
         <QuestionsPopup
           isVisible={showQuestionsPopup}
-          onClose={() => setShowQuestionsPopup(false)}
+          onClose={() => {
+            setShowQuestionsPopup(false);
+            setShouldStartExam(false);
+            setShouldStartExam(false);
+          }}
           material={questionsPopupMaterial}
         />
 

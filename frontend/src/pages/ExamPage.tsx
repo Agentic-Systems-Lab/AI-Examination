@@ -971,9 +971,9 @@ function ExamPage() {
                   📋 View Exam Transcript
                 </button>
                 {conversationLogPath && (
-                  <p className="text-sm text-gray-600 mt-3 flex items-center">
-                    <span className="mr-2">💾</span>
-                    Saved to: {conversationLogPath}
+                  <p className="text-sm text-gray-600 mt-3 flex items-start w-full">
+                    <span className="mr-2 flex-shrink-0">💾</span>
+                    <span className="break-words min-w-0 flex-1">Saved to: {conversationLogPath}</span>
                   </p>
                 )}
               </div>
