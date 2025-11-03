@@ -306,8 +306,8 @@ async def submit_answer(
         db.add(answer_db)
         
         # Update session data
-        answers_data = session.answers_data or []
-        answers_data.append({
+        existing_answers = session.answers_data or []
+        session.answers_data = existing_answers + [{
             "question_id": current_question['id'],
             "answer": answer.answer,
             "confidence_level": answer.confidence_level,
@@ -315,9 +315,8 @@ async def submit_answer(
             "is_correct": is_correct,
             "score": ai_score,
             "feedback": ai_feedback
-        })
+        }]
         
-        session.answers_data = answers_data
         session.current_question += 1
         session.status = ExamStatus.IN_PROGRESS.value
         
