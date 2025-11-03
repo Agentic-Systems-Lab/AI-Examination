@@ -168,7 +168,8 @@ export function ExamProvider({ children }: ExamProviderProps) {
       setError(null)
       
       const response = await examAPI.getMaterials()
-      setMaterials(response.materials || [])
+      const sortedMaterials = response.materials.sort((a: Material, b: Material) => b.upload_time.localeCompare(a.upload_time))
+      setMaterials(sortedMaterials || [])
     } catch (err) {
       console.error('Failed to load materials:', err)
       setError('Failed to load study materials')
