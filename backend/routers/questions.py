@@ -25,8 +25,16 @@ from models import (
 
 router = APIRouter()
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client (lazy initialization)
+def get_openai_client():
+    """Get OpenAI client with proper error handling."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key or api_key == "your_openai_api_key_here":
+        raise HTTPException(
+            status_code=500, 
+            detail="OpenAI API key not configured. Please set OPENAI_API_KEY environment variable."
+        )
+    return OpenAI(api_key=api_key)
 
 def create_question_generation_prompt(content: str, num_questions: int, 
                                     question_types: List[QuestionType], 
@@ -87,7 +95,7 @@ REQUIREMENTS:
 4. Provide clear, unambiguous questions
 5. For multiple choice: include exactly 4 options with only one correct answer
 6. For all question types: provide a comprehensive explanation of the correct answer
-7. Distribute questions evenly across the requested types
+7. The questions are all short essay questions.
 8. Ensure questions test different aspects of the material (facts, concepts, applications)
 
 OUTPUT FORMAT (JSON):
@@ -140,7 +148,7 @@ async def generate_questions_with_openai(material: MaterialDB, request: Question
         )
         
         # Call OpenAI API with gpt-4o-mini for better performance and larger context
-        response = client.chat.completions.create(
+        response = get_openai_client().chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {
@@ -150,7 +158,7 @@ async def generate_questions_with_openai(material: MaterialDB, request: Question
                 {"role": "user", "content": prompt}
             ],
             max_tokens=4000,
-            temperature=0.7
+            temperature=0.2
         )
         
         # Parse response
@@ -209,10 +217,7 @@ async def generate_questions_with_openai(material: MaterialDB, request: Question
 
 def save_questions_to_file(questions: List[Question], material: MaterialDB) -> str:
     """
-    Save generated questions to a formatted text file with validation.
-    
-    This function creates a well-formatted text file containing all the generated
-    questions with answers and explanations, and validates the file was written correctly.
+    Save generated questions to a formatted text file for backup/export.
     
     Args:
         questions: List of generated questions
@@ -222,7 +227,7 @@ def save_questions_to_file(questions: List[Question], material: MaterialDB) -> s
         str: File path where questions were saved
         
     Raises:
-        Exception: If file writing fails or validation fails
+        Exception: If file writing fails
     """
     # Create filename
     safe_title = "".join(c for c in material.title if c.isalnum() or c in (' ', '-', '_')).rstrip()
@@ -232,7 +237,7 @@ def save_questions_to_file(questions: List[Question], material: MaterialDB) -> s
     # Ensure questions directory exists
     os.makedirs("questions", exist_ok=True)
     
-    # Write questions to file with detailed error handling
+    # Write questions to file
     try:
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(f"EXAM QUESTIONS\n")
@@ -261,103 +266,10 @@ def save_questions_to_file(questions: List[Question], material: MaterialDB) -> s
                 
                 f.write(f"{'-' * 40}\n\n")
         
-        # Validate the file was written correctly
-        _validate_question_file(file_path, len(questions))
-        
         return file_path
         
     except Exception as e:
-        # Clean up failed file if it exists
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-            except:
-                pass
         raise Exception(f"Failed to save questions to file: {str(e)}")
-
-
-def _validate_question_file(file_path: str, expected_questions: int) -> None:
-    """
-    Validate that a question file was written correctly.
-    
-    Args:
-        file_path: Path to the file to validate
-        expected_questions: Expected number of questions
-        
-    Raises:
-        Exception: If validation fails
-    """
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Check file is not empty
-        if not content.strip():
-            raise Exception("File is empty")
-        
-        # Count question headers
-        question_count = content.count('QUESTION ')
-        if question_count != expected_questions:
-            raise Exception(f"Expected {expected_questions} questions, found {question_count}")
-        
-        # Check for truncation indicators
-        if not content.endswith('\n\n') and not content.endswith('--\n'):
-            raise Exception("File appears to be truncated")
-            
-    except Exception as e:
-        raise Exception(f"File validation failed: {str(e)}")
-
-
-def regenerate_question_file_from_db(material_id: int, db: Session) -> str:
-    """
-    Regenerate question file from database to ensure synchronization.
-    
-    This function fetches all questions for a material from the database
-    and creates a new text file, ensuring database-file consistency.
-    
-    Args:
-        material_id: ID of the material to regenerate questions for
-        db: Database session
-        
-    Returns:
-        str: Path to the regenerated file
-        
-    Raises:
-        HTTPException: If material not found or no questions exist
-    """
-    from models import MaterialDB, QuestionDB
-    
-    # Get material
-    material = db.query(MaterialDB).filter(MaterialDB.id == material_id).first()
-    if not material:
-        raise HTTPException(status_code=404, detail="Material not found")
-    
-    # Get all questions from database
-    questions_db = db.query(QuestionDB).filter(
-        QuestionDB.material_id == material_id
-    ).order_by(QuestionDB.id).all()
-    
-    if not questions_db:
-        raise HTTPException(status_code=404, detail="No questions found for this material")
-    
-    # Convert to Question objects
-    questions = []
-    for q_db in questions_db:
-        question = Question(
-            id=q_db.id,
-            text=q_db.text,
-            type=QuestionType(q_db.type),
-            options=q_db.options,
-            correct_answer=q_db.correct_answer,
-            explanation=q_db.explanation,
-            difficulty_level=q_db.difficulty_level
-        )
-        questions.append(question)
-    
-    # Save to file with validation
-    file_path = save_questions_to_file(questions, material)
-    
-    return file_path
 
 @router.post("/generate")
 async def generate_questions(
@@ -417,16 +329,12 @@ async def generate_questions(
         
         db.commit()
         
-        # Save questions to text file with validation
+        # Save questions to text file for backup/export (non-critical)
+        file_path = None
         try:
             file_path = save_questions_to_file(questions, material)
-            file_available = True
-            file_message = "Text file created successfully"
         except Exception as file_error:
-            print(f"Warning: Failed to create text file: {file_error}")
-            file_path = None
-            file_available = False
-            file_message = f"Questions saved to database successfully. Text file creation failed: {str(file_error)}"
+            print(f"Warning: Failed to create backup text file: {file_error}")
         
         return {
             "message": "Questions generated successfully",
@@ -434,9 +342,7 @@ async def generate_questions(
             "material_title": material.title,
             "questions_generated": len(questions),
             "questions": [q.dict() for q in saved_questions],
-            "file_path": file_path,
-            "file_available": file_available,
-            "file_message": file_message
+            "file_path": file_path
         }
         
     except HTTPException:
@@ -685,7 +591,6 @@ async def bulk_update_questions(
     This endpoint handles multiple operations in a single transaction:
     - Updates existing questions
     - Deletes specified questions
-    - Regenerates the questions file to maintain sync
     
     Args:
         request: Dictionary containing material_id, updates, and deletes arrays
@@ -746,13 +651,6 @@ async def bulk_update_questions(
         # Commit all changes
         db.commit()
         
-        # Regenerate questions file to ensure sync
-        try:
-            regenerate_question_file_from_db(material_id, db)
-        except Exception as e:
-            # Log error but don't fail the entire operation
-            print(f"Warning: Failed to regenerate question file: {str(e)}")
-        
         return {
             "message": "Bulk operations completed",
             "material_id": material_id,
@@ -781,7 +679,6 @@ async def create_question(
     Create a new question for a specific material.
     
     This endpoint allows adding individual questions manually to existing materials.
-    The question will be added to the database and the questions file will be updated.
     
     Args:
         material_id: ID of the material to add the question to
@@ -825,13 +722,6 @@ async def create_question(
             explanation=new_question.explanation,
             difficulty_level=new_question.difficulty_level
         )
-        
-        # Try to regenerate the questions file to keep it in sync
-        try:
-            regenerate_question_file_from_db(material_id, db)
-        except Exception as e:
-            # Log the error but don't fail the question creation
-            print(f"Warning: Failed to regenerate questions file after adding question: {e}")
         
         return {
             "message": "Question created successfully",
@@ -906,277 +796,3 @@ async def get_question_count(
             status_code=500,
             detail=f"Failed to get question count: {str(e)}"
         )
-
-@router.get("/file/{material_title}")
-async def get_questions_from_file(
-    material_title: str,
-    db: Session = Depends(get_database_session)
-):
-    """
-    Load questions directly from the generated questions text file.
-    
-    This endpoint reads questions from the text file and returns only
-    the question text and options (without answers) for exam purposes.
-    
-    Args:
-        material_title: Title of the material to find questions file
-        db: Database session
-        
-    Returns:
-        dict: List of questions with options (no answers revealed)
-        
-    Raises:
-        HTTPException: If file not found or parsing fails
-    """
-    try:
-        # Find the most recent questions file for this material
-        questions_dir = "questions"
-        if not os.path.exists(questions_dir):
-            raise HTTPException(status_code=404, detail="Questions directory not found")
-        
-        # Look for files matching the material title
-        matching_files = []
-        safe_title = "".join(c for c in material_title if c.isalnum() or c in (' ', '-', '_')).rstrip()
-        
-        for filename in os.listdir(questions_dir):
-            if filename.startswith(f"questions_{safe_title}") and filename.endswith(".txt"):
-                file_path = os.path.join(questions_dir, filename)
-                matching_files.append((filename, file_path, os.path.getmtime(file_path)))
-        
-        if not matching_files:
-            raise HTTPException(
-                status_code=404, 
-                detail=f"No questions file found for material: {material_title}"
-            )
-        
-        # Get the most recent file
-        latest_file = max(matching_files, key=lambda x: x[2])
-        file_path = latest_file[1]
-        
-        # Parse the questions file
-        questions = []
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Split content into question blocks
-        question_blocks = content.split('QUESTION ')
-        
-        for block in question_blocks[1:]:  # Skip the header block
-            lines = block.strip().split('\n')
-            if len(lines) < 3:
-                continue
-                
-            # Extract question number and details
-            question_num = lines[0].strip()
-            question_text = ""
-            options = []
-            reading_question = False
-            reading_options = False
-            
-            for line in lines[1:]:
-                line = line.strip()
-                
-                # Skip metadata lines
-                if line.startswith('Type:') or line.startswith('Difficulty:'):
-                    continue
-                    
-                # Stop at correct answer section
-                if line.startswith('CORRECT ANSWER:'):
-                    break
-                    
-                # Start reading question text
-                if not reading_question and not line.startswith('Type:') and not line.startswith('Difficulty:') and line:
-                    reading_question = True
-                    question_text = line
-                    continue
-                
-                # Continue reading question or start reading options
-                if reading_question:
-                    if line.startswith(('A)', 'B)', 'C)', 'D)')):
-                        reading_options = True
-                        options.append(line)
-                    elif line and not reading_options:
-                        question_text += " " + line
-                
-                # Continue reading options
-                if reading_options and line.startswith(('A)', 'B)', 'C)', 'D)')):
-                    if line not in options:  # Avoid duplicates
-                        options.append(line)
-            
-            # Add question if we have valid content
-            if question_text.strip() and len(options) >= 2:
-                questions.append({
-                    "id": len(questions) + 1,
-                    "text": question_text.strip(),
-                    "type": "multiple_choice",
-                    "options": options,
-                    "difficulty_level": 3  # Default difficulty
-                })
-        
-        if not questions:
-            raise HTTPException(
-                status_code=400, 
-                detail="No valid questions found in file"
-            )
-        
-        return {
-            "material_title": material_title,
-            "questions": questions,
-            "total_count": len(questions),
-            "file_path": file_path,
-            "message": f"Loaded {len(questions)} questions from file"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to load questions from file: {str(e)}"
-        )
-
-
-@router.post("/material/{material_id}/regenerate-file")
-async def regenerate_question_file(
-    material_id: int,
-    db: Session = Depends(get_database_session)
-):
-    """
-    Regenerate question text file from database to ensure synchronization.
-    
-    This endpoint fetches all questions for a material from the database
-    and creates a new text file, ensuring database-file consistency.
-    Useful when text files become corrupted, truncated, or out of sync.
-    
-    Args:
-        material_id: ID of the material to regenerate questions for
-        db: Database session
-        
-    Returns:
-        dict: Regeneration result with file information
-        
-    Raises:
-        HTTPException: If material not found or no questions exist
-    """
-    try:
-        file_path = regenerate_question_file_from_db(material_id, db)
-        
-        # Get material info for response
-        material = db.query(MaterialDB).filter(MaterialDB.id == material_id).first()
-        
-        # Count questions in database
-        question_count = db.query(QuestionDB).filter(
-            QuestionDB.material_id == material_id
-        ).count()
-        
-        return {
-            "message": "Question file regenerated successfully from database",
-            "material_id": material_id,
-            "material_title": material.title,
-            "questions_count": question_count,
-            "file_path": file_path,
-            "regenerated_at": datetime.now().isoformat()
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to regenerate question file: {str(e)}"
-        )
-
-
-@router.get("/material/{material_id}/sync-status")
-async def check_database_file_sync(
-    material_id: int,
-    db: Session = Depends(get_database_session)
-):
-    """
-    Check synchronization status between database and text files.
-    
-    This endpoint compares the number of questions in the database
-    with the most recent text file to identify sync issues.
-    
-    Args:
-        material_id: ID of the material to check
-        db: Database session
-        
-    Returns:
-        dict: Synchronization status information
-        
-    Raises:
-        HTTPException: If material not found
-    """
-    try:
-        # Get material
-        material = db.query(MaterialDB).filter(MaterialDB.id == material_id).first()
-        if not material:
-            raise HTTPException(status_code=404, detail="Material not found")
-        
-        # Count questions in database
-        db_question_count = db.query(QuestionDB).filter(
-            QuestionDB.material_id == material_id
-        ).count()
-        
-        # Find most recent question file
-        import glob
-        safe_title = "".join(c for c in material.title if c.isalnum() or c in (' ', '-', '_')).rstrip()
-        pattern = f"questions/questions_{safe_title}_*.txt"
-        files = glob.glob(pattern)
-        
-        file_status = {}
-        if files:
-            # Get most recent file
-            most_recent_file = max(files, key=os.path.getmtime)
-            
-            try:
-                with open(most_recent_file, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                
-                file_question_count = content.count('QUESTION ')
-                file_size = os.path.getsize(most_recent_file)
-                
-                file_status = {
-                    "file_path": most_recent_file,
-                    "questions_in_file": file_question_count,
-                    "file_size_bytes": file_size,
-                    "file_exists": True,
-                    "last_modified": datetime.fromtimestamp(os.path.getmtime(most_recent_file)).isoformat()
-                }
-            except Exception as e:
-                file_status = {
-                    "file_path": most_recent_file,
-                    "error": f"Failed to read file: {str(e)}",
-                    "file_exists": True,
-                    "questions_in_file": 0
-                }
-        else:
-            file_status = {
-                "file_exists": False,
-                "questions_in_file": 0,
-                "file_path": None
-            }
-        
-        # Determine sync status
-        is_synced = file_status.get("questions_in_file", 0) == db_question_count
-        
-        return {
-            "material_id": material_id,
-            "material_title": material.title,
-            "database": {
-                "questions_count": db_question_count
-            },
-            "file": file_status,
-            "is_synchronized": is_synced,
-            "sync_status": "✓ Synchronized" if is_synced else "✗ Out of sync",
-            "recommendation": "No action needed" if is_synced else "Regenerate file from database"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to check sync status: {str(e)}"
-        ) 

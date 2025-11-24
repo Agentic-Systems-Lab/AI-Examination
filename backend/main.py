@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import routers
-from routers import upload, questions, exam, scoring, audio
+from routers import upload, questions, exam, scoring, survey
 
 # Import database initialization
 from database import init_database
@@ -41,8 +41,6 @@ app.add_middleware(
 # Create necessary directories
 os.makedirs("uploads", exist_ok=True)
 os.makedirs("questions", exist_ok=True)
-os.makedirs("audio_temp", exist_ok=True)
-os.makedirs("audio_cache", exist_ok=True)
 os.makedirs("exam_logs", exist_ok=True)
 
 # Initialize database
@@ -56,7 +54,7 @@ app.include_router(upload.router, prefix="/api/upload", tags=["Upload"])
 app.include_router(questions.router, prefix="/api/questions", tags=["Questions"])
 app.include_router(exam.router, prefix="/api/exam", tags=["Exam"])
 app.include_router(scoring.router, prefix="/api/scoring", tags=["Scoring"])
-app.include_router(audio.router, prefix="/api/audio", tags=["Audio"])
+app.include_router(survey.router, prefix="/api/survey", tags=["Survey"])
 
 @app.get("/")
 async def root():

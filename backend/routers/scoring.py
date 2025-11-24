@@ -25,8 +25,16 @@ from models import (
 
 router = APIRouter()
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client (lazy initialization)
+def get_openai_client():
+    """Get OpenAI client with proper error handling."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key or api_key == "your_openai_api_key_here":
+        raise HTTPException(
+            status_code=500, 
+            detail="OpenAI API key not configured. Please set OPENAI_API_KEY environment variable."
+        )
+    return OpenAI(api_key=api_key)
 
 def calculate_detailed_score(session: ExamSessionDB, db: Session) -> Dict[str, Any]:
     """
@@ -257,7 +265,7 @@ time management, and performance across different difficulty levels.
 """
         
         # Use gpt-4o-mini for better performance and larger context window
-        response = client.chat.completions.create(
+        response = get_openai_client().chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {
@@ -414,22 +422,62 @@ async def get_score_report(
             ai_feedback = await generate_ai_feedback(session, score_data, material)
         
         # Get detailed answer analysis
-        answers_data = session.answers_data or []
+        # Get answers from both session data and individual answers table
+        session_answers = session.answers_data or []
+        individual_answers = db.query(AnswerDB).filter(AnswerDB.exam_session_id == session.id).all()
+        
         questions_data = session.questions_data or []
         
+        # Create a comprehensive answer map
+        # Priority: individual database records over session data (more reliable)
+        answer_map = {}
+        
+        # First, add session answers as fallback
+        for session_answer in session_answers:
+            question_id = session_answer.get('question_id')
+            if question_id:
+                answer_map[question_id] = {
+                    "question_id": question_id,
+                    "answer": session_answer.get('answer', ''),
+                    "confidence_level": session_answer.get('confidence_level'),
+                    "time_taken": session_answer.get('time_taken'),
+                    "is_correct": session_answer.get('is_correct', False),
+                    "score": session_answer.get('score', 0),
+                    "feedback": session_answer.get('feedback', ''),
+                    "source": "session"
+                }
+        
+        # Then, override with individual database records (higher priority)
+        for individual_answer in individual_answers:
+            answer_map[individual_answer.question_id] = {
+                "question_id": individual_answer.question_id,
+                "answer": individual_answer.answer_text or '',
+                "confidence_level": individual_answer.confidence_level,
+                "time_taken": individual_answer.time_taken,
+                "is_correct": individual_answer.is_correct or False,
+                "score": individual_answer.score or 0,
+                "feedback": individual_answer.feedback or '',
+                "source": "database"
+            }
+        
         question_details = []
-        for i, (answer, question) in enumerate(zip(answers_data, questions_data)):
+        for i, question in enumerate(questions_data):
+            question_id = question.get('id')
+            answer = answer_map.get(question_id, {})
+            
             question_details.append({
                 "question_number": i + 1,
                 "question_text": question.get('text', ''),
                 "question_type": question.get('type', ''),
                 "difficulty_level": question.get('difficulty_level', 3),
-                "student_answer": answer.get('answer', ''),
+                "student_answer": answer.get('answer', '') if answer else '(Not answered)',
                 "correct_answer": question.get('correct_answer', ''),
-                "is_correct": answer.get('is_correct', False),
+                "explanation": question.get('explanation', ''),
+                "is_correct": answer.get('is_correct', False) if answer else False,
+                "score": answer.get('score', 0.0) if answer else 0.0,
+                "feedback": answer.get('feedback', '') if answer else 'Question not answered',
                 "confidence_level": answer.get('confidence_level'),
-                "time_taken": answer.get('time_taken'),
-                "explanation": question.get('explanation', '')
+                "time_taken": answer.get('time_taken')
             })
         
         return {
@@ -448,9 +496,9 @@ async def get_score_report(
             "question_details": question_details,
             "summary": {
                 "total_questions": len(questions_data),
-                "questions_answered": len(answers_data),
-                "correct_answers": sum(1 for a in answers_data if a.get('is_correct', False)),
-                "accuracy_percentage": round((sum(1 for a in answers_data if a.get('is_correct', False)) / len(answers_data)) * 100, 1) if answers_data else 0
+                "questions_answered": len(answer_map),
+                "correct_answers": sum(1 for a in answer_map.values() if a.get('is_correct', False)),
+                "accuracy_percentage": round((sum(1 for a in answer_map.values() if a.get('is_correct', False)) / len(answer_map)) * 100, 1) if answer_map else 0
             }
         }
         

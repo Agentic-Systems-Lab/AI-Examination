@@ -115,27 +115,6 @@
     @apply bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all duration-300 ease-out;
   }
 
-  /* Voice recording indicator */
-  .recording-pulse {
-    @apply animate-pulse-slow;
-  }
-
-  .recording-dot {
-    @apply w-3 h-3 bg-error-500 rounded-full animate-pulse;
-  }
-
-  /* Chat message styles */
-  .message-bubble {
-    @apply max-w-xs lg:max-w-md px-4 py-2 rounded-2xl text-sm;
-  }
-
-  .message-user {
-    @apply message-bubble bg-primary-600 text-white ml-auto;
-  }
-
-  .message-assistant {
-    @apply message-bubble bg-gray-100 text-gray-900 mr-auto;
-  }
 
   /* Loading states */
   .loading-spinner {

@@ -318,6 +318,10 @@ async def submit_answer(
         })
         
         session.answers_data = answers_data
+        # Flag the JSON column as modified for SQLAlchemy
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(session, "answers_data")
+        
         session.current_question += 1
         session.status = ExamStatus.IN_PROGRESS.value
         
@@ -1230,6 +1234,56 @@ async def get_session_results(
         # Get material info
         material = db.query(MaterialDB).filter(MaterialDB.id == session.material_id).first()
         
+        # Get answers from both session data and individual answers table
+        session_answers = session.answers_data or []
+        individual_answers = db.query(AnswerDB).filter(AnswerDB.exam_session_id == session.id).all()
+        
+        # Create a comprehensive answers list
+        # Priority: individual database records over session data (more reliable)
+        answers_data = []
+        
+        # First, add session answers as fallback
+        for session_answer in session_answers:
+            if 'question_id' in session_answer:
+                answers_data.append({
+                    "question_id": session_answer['question_id'],
+                    "answer": session_answer.get('answer', ''),
+                    "confidence_level": session_answer.get('confidence_level'),
+                    "time_taken": session_answer.get('time_taken'),
+                    "is_correct": session_answer.get('is_correct', False),
+                    "score": session_answer.get('score', 0),
+                    "feedback": session_answer.get('feedback', ''),
+                    "source": "session"
+                })
+        
+        # Then, override with individual database records (higher priority)
+        for individual_answer in individual_answers:
+            # Find existing answer in the list and replace it, or add new one
+            existing_index = None
+            for i, existing_answer in enumerate(answers_data):
+                if existing_answer['question_id'] == individual_answer.question_id:
+                    existing_index = i
+                    break
+            
+            individual_answer_data = {
+                "question_id": individual_answer.question_id,
+                "answer": individual_answer.answer_text or '',
+                "confidence_level": individual_answer.confidence_level,
+                "time_taken": individual_answer.time_taken,
+                "is_correct": individual_answer.is_correct or False,
+                "score": individual_answer.score or 0,
+                "feedback": individual_answer.feedback or '',
+                "source": "database"
+            }
+            
+            if existing_index is not None:
+                answers_data[existing_index] = individual_answer_data
+            else:
+                answers_data.append(individual_answer_data)
+        
+        # Sort answers by question_id to maintain order
+        answers_data.sort(key=lambda x: x['question_id'])
+        
         return {
             "exam_session_id": session.id,
             "material_title": material.title if material else "Unknown",
@@ -1238,7 +1292,7 @@ async def get_session_results(
             "start_time": session.start_time.isoformat() if session.start_time else None,
             "end_time": session.end_time.isoformat() if session.end_time else None,
             "questions_data": session.questions_data or [],
-            "answers_data": session.answers_data or [],
+            "answers_data": answers_data,
             "final_score": session.final_score,
             "score_breakdown": session.score_breakdown
         }

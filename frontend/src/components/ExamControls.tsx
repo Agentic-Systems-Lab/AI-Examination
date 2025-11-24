@@ -8,6 +8,7 @@
  */
 
 import { Play, SkipForward, CheckCircle, Clock, BookOpen } from 'lucide-react'
+import { getDisplayTitle } from '../utils/textUtils'
 
 interface ExamControlsProps {
   /** Current exam session status */
@@ -20,12 +21,6 @@ interface ExamControlsProps {
   answeredQuestions: number
   /** Whether the exam can be started */
   canStartExam: boolean
-  /** Whether recording is in progress */
-  isRecording: boolean
-  /** Whether examiner is speaking */
-  isExaminerSpeaking: boolean
-  /** Whether transcription is in progress */
-  isTranscribing: boolean
   /** Material title */
   materialTitle?: string
   /** Exam duration in seconds */
@@ -54,9 +49,6 @@ function ExamControls({
   totalQuestions,
   answeredQuestions,
   canStartExam,
-  isRecording,
-  isExaminerSpeaking,
-  isTranscribing,
   materialTitle,
   examDuration = 0,
   onStartExam,
@@ -101,10 +93,8 @@ function ExamControls({
   const getCurrentActivity = (): string => {
     if (examStatus === 'not_started') return 'Ready to begin'
     if (examStatus === 'completed') return 'Exam completed'
-    if (isExaminerSpeaking) return 'Examiner asking question'
-    if (isRecording) return 'Recording your answer'
-    if (isTranscribing) return 'Processing your response'
-    return 'Waiting for your response'
+    if (examStatus === 'in_progress') return 'Answer the question'
+    return 'Waiting to start'
   }
 
   return (
@@ -119,7 +109,7 @@ function ExamControls({
             <div className="p-2 bg-blue-100/50 rounded-full backdrop-blur-sm">
               <BookOpen className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-base font-medium">{materialTitle}</span>
+            <span className="text-base font-medium">{getDisplayTitle(materialTitle, 'header')}</span>
           </div>
         )}
       </div>
@@ -200,7 +190,7 @@ function ExamControls({
             {onSkipQuestion && currentQuestionNumber <= totalQuestions && (
               <button
                 onClick={onSkipQuestion}
-                disabled={disabled || isRecording || isExaminerSpeaking}
+                disabled={disabled}
                 className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 
                          disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl 
                          font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 backdrop-blur-sm border border-white/20"
@@ -213,7 +203,7 @@ function ExamControls({
             {/* Complete exam button */}
             <button
               onClick={onCompleteExam}
-              disabled={disabled || isRecording || isExaminerSpeaking}
+              disabled={disabled}
               className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 
                        disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl 
                        font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 backdrop-blur-sm border border-white/20"

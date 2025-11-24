@@ -1,14 +1,13 @@
 /**
  * Exam Context for AI Examiner
  * 
- * This context manages exam sessions, question flow, voice interactions,
+ * This context manages exam sessions, question flow,
  * and all exam-related state throughout the application.
  * 
  * Author: AI Assistant
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { useAuthContext } from './AuthContext'
 import * as examAPI from '../services/examAPI'
 
 // Types
@@ -55,6 +54,10 @@ export interface ExamSession {
 
 export interface ScoreReport {
   exam_session_id: number
+  material_title: string
+  material_subject: string
+  exam_date: string | null
+  completion_time: string | null
   final_score: number
   score_breakdown: {
     basic_accuracy: number
@@ -72,11 +75,23 @@ export interface ScoreReport {
   question_details: Array<{
     question_number: number
     question_text: string
+    question_type: string
+    difficulty_level: number
     student_answer: string
     correct_answer: string
-    is_correct: boolean
     explanation: string
+    is_correct: boolean
+    score: number
+    feedback: string
+    confidence_level?: number
+    time_taken?: number
   }>
+  summary: {
+    total_questions: number
+    questions_answered: number
+    correct_answers: number
+    accuracy_percentage: number
+  }
 }
 
 
@@ -138,8 +153,6 @@ interface ExamProviderProps {
  * Provides exam state and methods to child components.
  */
 export function ExamProvider({ children }: ExamProviderProps) {
-  const { isAuthenticated } = useAuthContext()
-  
   // State
   const [materials, setMaterials] = useState<Material[]>([])
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null)
@@ -154,10 +167,8 @@ export function ExamProvider({ children }: ExamProviderProps) {
 
   // Load materials on mount
   useEffect(() => {
-    if (isAuthenticated) {
-      loadMaterials()
-    }
-  }, [isAuthenticated])
+    loadMaterials()
+  }, [])
 
   /**
    * Load available study materials
@@ -240,11 +251,6 @@ export function ExamProvider({ children }: ExamProviderProps) {
       
       // Check if questions were actually generated successfully
       if (response && response.questions_generated > 0) {
-        // Questions were generated successfully, even if file creation failed
-        // Don't set an error state for file creation issues
-        if (!response.file_available) {
-          console.warn('Questions generated but file creation failed:', response.file_message)
-        }
         return true
       } else {
         setError('No questions were generated')

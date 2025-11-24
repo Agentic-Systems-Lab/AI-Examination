@@ -69,8 +69,6 @@ interface QuestionGenerationResponse {
   questions_generated: number
   questions: Question[]
   file_path: string | null
-  file_available: boolean
-  file_message?: string
 }
 
 
@@ -85,7 +83,6 @@ interface AnswerSubmissionResponse {
   total_questions: number
   is_exam_completed: boolean
   next_question?: Question
-  conversation_log_file?: string
 }
 
 
@@ -222,22 +219,6 @@ export async function getQuestion(questionId: number): Promise<Question> {
 }
 
 /**
- * Get questions from generated text file for a specific material
- */
-export async function getQuestionsFromFile(
-  materialTitle: string
-): Promise<{
-  material_title: string
-  questions: Question[]
-  total_count: number
-  file_path: string
-  message: string
-}> {
-  const response = await api.get(`/questions/file/${encodeURIComponent(materialTitle)}`)
-  return response.data
-}
-
-/**
  * Update a specific question
  */
 export async function updateQuestion(questionId: number, questionData: Question): Promise<Question> {
@@ -347,32 +328,6 @@ export async function submitAnswer(
 }
 
 /**
- * Generate follow-up question based on student's answer
- */
-export async function generateFollowUpQuestion(
-  sessionId: number,
-  questionId: number,
-  studentAnswer: string,
-  context?: string
-): Promise<{
-  exam_session_id: number
-  original_question_id: number
-  followup_question: string
-  purpose: string
-  expected_answer_type: string
-  generated_at: string
-}> {
-  const response = await api.post(`/exam/session/${sessionId}/followup`, {
-    exam_session_id: sessionId,
-    question_id: questionId,
-    student_answer: studentAnswer,
-    context,
-  })
-
-  return response.data
-}
-
-/**
  * Get detailed progress for an exam session
  */
 export async function getExamProgress(sessionId: number): Promise<{
@@ -410,7 +365,6 @@ export async function completeExamSession(sessionId: number): Promise<{
   questions_answered: number
   correct_answers: number
   completion_time: string
-  conversation_log_file?: string
 }> {
   const response = await api.post(`/exam/session/${sessionId}/complete`)
   return response.data
@@ -432,19 +386,6 @@ export async function getSessionResults(sessionId: number): Promise<{
   score_breakdown: any
 }> {
   const response = await api.get(`/exam/session/${sessionId}/results`)
-  return response.data
-}
-
-/**
- * Generate conversation log file for an exam session
- */
-export async function generateConversationLog(sessionId: number): Promise<{
-  message: string
-  exam_session_id: number
-  log_file_path: string
-  generated_at: string
-}> {
-  const response = await api.get(`/exam/session/${sessionId}/conversation-log`)
   return response.data
 }
 
@@ -500,6 +441,21 @@ export async function getExamHistory(
 }
 
 
+
+
+/**
+ * Submit survey feedback
+ */
+export async function submitSurvey(data: {
+    fairness_rating: number
+    ai_accuracy_rating: number
+    comments: string
+    session_id?: number
+    question_number?: number
+}): Promise<{ status: string, message: string }> {
+  const response = await api.post('/survey/', data)
+  return response.data
+}
 
 // === UTILITY FUNCTIONS ===
 

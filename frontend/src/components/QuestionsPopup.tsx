@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react'
 import { Question, Material } from '../contexts/ExamContext'
 import * as examAPI from '../services/examAPI'
 import LoadingSpinner from './LoadingSpinner'
+import { getDisplayTitle } from '../utils/textUtils'
 import toast from 'react-hot-toast'
 
 interface QuestionsPopupProps {
@@ -301,7 +302,7 @@ function QuestionsPopup({ isVisible, onClose, material }: QuestionsPopupProps) {
             📝 Questions & Solutions
             {material && (
               <span className="text-sm font-normal text-blue-100 ml-2 block sm:inline">
-                {material.title}
+                {getDisplayTitle(material.title, 'popup')}
               </span>
             )}
           </h2>

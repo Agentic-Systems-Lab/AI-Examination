@@ -7,25 +7,22 @@
  * Author: ExamFlow Team
  */
 
-import React from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { useAuthContext } from './contexts/AuthContext'
 import { useExamContext } from './contexts/ExamContext'
 
 // Import pages/components (these will be created)
 import Layout from './components/Layout'
-import HomePage from './pages/HomePage'
 import UploadPage from './pages/UploadPage'
 import ExamPage from './pages/ExamPage'
 import ResultsPage from './pages/ResultsPage'
 import LoadingSpinner from './components/LoadingSpinner'
 
 function App() {
-  const { isLoading: authLoading } = useAuthContext()
+  
   const { isLoading: examLoading } = useExamContext()
 
   // Show loading spinner while initializing
-  if (authLoading || examLoading) {
+  if (examLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <LoadingSpinner size="large" />
@@ -39,8 +36,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* Main application routes */}
-          <Route index element={<HomePage />} />
-          <Route path="/upload" element={<UploadPage />} />
+          <Route index element={<UploadPage />} />
           <Route path="/exam/:sessionId?" element={<ExamPage />} />
           <Route path="/results/:sessionId?" element={<ResultsPage />} />
           
@@ -56,7 +52,7 @@ function App() {
                   href="/" 
                   className="btn-primary"
                 >
-                  Return Home
+                  Return to Upload
                 </a>
               </div>
             </div>
