@@ -3,7 +3,7 @@ __pycache__/
 */__pycache__/
 backend/__pycache__/
 backend/routers/__pycache__/
-backend/survey_results.json/
+backend/survey_results.json
 *.py[cod]
 *$py.class
 *.pyc

@@ -62,7 +62,6 @@ function ResultsPage() {
       submitted: boolean
     }
   }>({})
-  const [submittingQuestionSurvey, setSubmittingQuestionSurvey] = useState<number | null>(null)
 
   // Function to calculate letter grade based on score
   const calculateGrade = (score: number): string => {
@@ -174,40 +173,6 @@ function ResultsPage() {
       toast.error('Failed to submit feedback. Please try again.')
     } finally {
       setIsSubmittingSurvey(false)
-    }
-  }
-
-  const handleQuestionSurveySubmit = async (questionNumber: number) => {
-    if (!sessionId) return
-
-    const survey = questionSurveys[questionNumber]
-    if (!survey || survey.fairness === 0 || survey.aiAccuracy === 0) {
-      toast.error('Please provide ratings for both questions.')
-      return
-    }
-
-    setSubmittingQuestionSurvey(questionNumber)
-    try {
-      await examAPI.submitSurvey({
-        fairness_rating: survey.fairness,
-        ai_accuracy_rating: survey.aiAccuracy,
-        comments: survey.comments,
-        session_id: parseInt(sessionId),
-        question_number: questionNumber,
-        email: studentEmail || undefined
-      })
-
-      setQuestionSurveys(prev => ({
-        ...prev,
-        [questionNumber]: { ...prev[questionNumber], submitted: true }
-      }))
-
-      toast.success(`Feedback for Question ${questionNumber} submitted!`)
-    } catch (error) {
-      console.error('Failed to submit question survey:', error)
-      toast.error('Failed to submit feedback. Please try again.')
-    } finally {
-      setSubmittingQuestionSurvey(null)
     }
   }
 
@@ -347,86 +312,66 @@ function ResultsPage() {
                       </div>
                     )}
 
-                    {/* Per-Question Survey */}
+                    {/* Per-Question Survey (saved locally, submitted with overall feedback) */}
                     <div className="mt-6 pt-6 border-t border-gray-300">
                       <h4 className="text-sm font-semibold text-gray-700 mb-4">Question Feedback</h4>
 
-                      {questionSurveys[question.question_number]?.submitted ? (
-                        <div className="bg-green-50 rounded p-4 text-center">
-                          <div className="text-green-500 text-2xl mb-2">✓</div>
-                          <p className="text-sm text-green-700 font-medium">Thank you for your feedback!</p>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                            Was this question fair? (1-5)
+                          </label>
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((rating) => (
+                              <button
+                                key={rating}
+                                type="button"
+                                onClick={() => updateQuestionSurvey(question.question_number, 'fairness', rating)}
+                                className={`w-8 h-8 rounded-full flex items-center justify-center border text-xs ${questionSurveys[question.question_number]?.fairness === rating
+                                  ? 'bg-blue-600 text-white border-blue-600'
+                                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                  }`}
+                              >
+                                {rating}
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-2">
-                              Was this question fair? (1-5)
-                            </label>
-                            <div className="flex gap-2">
-                              {[1, 2, 3, 4, 5].map((rating) => (
-                                <button
-                                  key={rating}
-                                  type="button"
-                                  onClick={() => updateQuestionSurvey(question.question_number, 'fairness', rating)}
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center border text-xs ${questionSurveys[question.question_number]?.fairness === rating
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                                    }`}
-                                >
-                                  {rating}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
 
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-2">
-                              Did the AI assess your answer correctly? (1-5)
-                            </label>
-                            <div className="flex gap-2">
-                              {[1, 2, 3, 4, 5].map((rating) => (
-                                <button
-                                  key={rating}
-                                  type="button"
-                                  onClick={() => updateQuestionSurvey(question.question_number, 'aiAccuracy', rating)}
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center border text-xs ${questionSurveys[question.question_number]?.aiAccuracy === rating
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                                    }`}
-                                >
-                                  {rating}
-                                </button>
-                              ))}
-                            </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                            Did the AI assess your answer correctly? (1-5)
+                          </label>
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((rating) => (
+                              <button
+                                key={rating}
+                                type="button"
+                                onClick={() => updateQuestionSurvey(question.question_number, 'aiAccuracy', rating)}
+                                className={`w-8 h-8 rounded-full flex items-center justify-center border text-xs ${questionSurveys[question.question_number]?.aiAccuracy === rating
+                                  ? 'bg-blue-600 text-white border-blue-600'
+                                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                  }`}
+                              >
+                                {rating}
+                              </button>
+                            ))}
                           </div>
-
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-2">
-                              Comments (optional)
-                            </label>
-                            <textarea
-                              rows={2}
-                              className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                              value={questionSurveys[question.question_number]?.comments || ''}
-                              onChange={(e) => updateQuestionSurvey(question.question_number, 'comments', e.target.value)}
-                              placeholder="Share your thoughts about this question..."
-                            />
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleQuestionSurveySubmit(question.question_number)}
-                            disabled={
-                              submittingQuestionSurvey === question.question_number ||
-                              !questionSurveys[question.question_number]?.fairness ||
-                              !questionSurveys[question.question_number]?.aiAccuracy
-                            }
-                            className="w-full py-2 px-4 border border-transparent rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {submittingQuestionSurvey === question.question_number ? 'Submitting...' : 'Submit Question Feedback'}
-                          </button>
                         </div>
-                      )}
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                            Comments (optional)
+                          </label>
+                          <textarea
+                            rows={2}
+                            className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                            value={questionSurveys[question.question_number]?.comments || ''}
+                            onChange={(e) => updateQuestionSurvey(question.question_number, 'comments', e.target.value)}
+                            placeholder="Share your thoughts about this question..."
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )
