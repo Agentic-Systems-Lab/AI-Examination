@@ -482,6 +482,7 @@ async def get_score_report(
         
         return {
             "exam_session_id": session_id,
+            "student_email": session.student_email,
             "material_title": material.title if material else "Unknown",
             "material_subject": material.subject if material else "Unknown",
             "exam_date": session.start_time.isoformat() if session.start_time else None,

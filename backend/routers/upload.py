@@ -175,6 +175,8 @@ async def upload_material(
     title: str = Form(...),
     description: Optional[str] = Form(None),
     subject: str = Form(...),
+    document_type: str = Form(...),
+    email: str = Form(...),
     db: Session = Depends(get_database_session)
 ):
     """
@@ -235,6 +237,8 @@ async def upload_material(
             title=title,
             description=description,
             subject=subject,
+            document_type=document_type,
+            student_email=email,
             file_path=file_path,
             file_type=file_extension,
             content_text=text_content
@@ -252,6 +256,7 @@ async def upload_material(
             "title": material_db.title,
             "description": material_db.description,
             "subject": material_db.subject,
+            "document_type": material_db.document_type,
             "file_type": material_db.file_type,
             "upload_time": material_db.upload_time,
             "text_preview": text_preview,

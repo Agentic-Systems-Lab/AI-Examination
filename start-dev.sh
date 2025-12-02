@@ -13,18 +13,11 @@ cleanup() {
 trap cleanup EXIT
 
 # Start backend
+# Start backend
 echo "Starting backend server..."
+source .venv/bin/activate
 cd backend
-
-# Activate virtual environment if it exists
-if [ -d "venv" ]; then
-    source venv/bin/activate
-else
-    echo "⚠️  Warning: Virtual environment not found. Run start-backend.sh first."
-fi
-
-# Start backend using venv python
-./venv/bin/uvicorn main:app --reload --host 0.0.0.0 --port 8000 &
+uvicorn main:app --reload --host 0.0.0.0 --port 8000 &
 cd ..
 
 # Wait a moment for backend to start

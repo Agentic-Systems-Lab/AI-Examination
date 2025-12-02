@@ -16,6 +16,7 @@ export interface Material {
   title: string
   description?: string
   subject: string
+  document_type: string
   file_type: string
   upload_time: string
   text_length: number
@@ -54,6 +55,7 @@ export interface ExamSession {
 
 export interface ScoreReport {
   exam_session_id: number
+  student_email?: string
   material_title: string
   material_subject: string
   exam_date: string | null
@@ -100,20 +102,20 @@ interface ExamContextType {
   // Materials
   materials: Material[]
   selectedMaterial: Material | null
-  
+
   // Current exam session
   currentSession: ExamSession | null
   isInExam: boolean
-  
 
-  
+
+
   // Loading states
   isLoading: boolean
   isGeneratingQuestions: boolean
-  
+
   // Error state
   error: string | null
-  
+
   // Actions
   loadMaterials: () => Promise<void>
   selectMaterial: (material: Material) => void
@@ -131,9 +133,9 @@ interface ExamContextType {
   submitAnswer: (answer: StudentAnswer) => Promise<boolean>
   completeExam: () => Promise<ScoreReport | null>
   getScoreReport: (sessionId: number) => Promise<ScoreReport | null>
-  
 
-  
+
+
   // Utility actions
   clearError: () => void
   resetExam: () => void
@@ -177,7 +179,7 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const response = await examAPI.getMaterials()
       setMaterials(response.materials || [])
     } catch (err) {
@@ -207,21 +209,21 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       // Call the delete API
       const response = await examAPI.deleteMaterial(materialId)
-      
+
       // Remove the deleted material from local state
       setMaterials(prev => prev.filter(material => material.id !== materialId))
-      
+
       // If the deleted material was selected, clear the selection
       if (selectedMaterial?.id === materialId) {
         setSelectedMaterial(null)
       }
-      
+
       console.log(`Material deleted successfully: ${response.message}`)
       console.log(`Total records deleted: ${response.total_records_deleted}`)
-      
+
       return true
     } catch (err) {
       console.error('Failed to delete material:', err)
@@ -246,9 +248,9 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsGeneratingQuestions(true)
       setError(null)
-      
+
       const response = await examAPI.generateQuestions(materialId, options)
-      
+
       // Check if questions were actually generated successfully
       if (response && response.questions_generated > 0) {
         return true
@@ -278,34 +280,34 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       // If no specific number of questions requested, check available questions first
       let adjustedOptions = options
       if (!options?.num_questions) {
         try {
           const questionsResponse = await examAPI.getQuestionsForMaterial(materialId)
           const availableCount = questionsResponse.questions.length
-          
+
           if (availableCount === 0) {
             setError('No questions available for this material. Please generate questions first.')
             return false
           }
-          
+
           // Adjust to use all available questions (up to a reasonable max)
           const questionsToUse = Math.min(availableCount, 10)
           adjustedOptions = {
             ...options,
             num_questions: questionsToUse
           }
-          
+
           console.log(`📊 Found ${availableCount} questions, using ${questionsToUse} for exam`)
         } catch (err) {
           console.warn('Could not check available questions, proceeding with default:', err)
         }
       }
-      
+
       const sessionResponse = await examAPI.startExamSession(materialId, adjustedOptions)
-      
+
       // Convert API response to ExamSession format
       const examSession: ExamSession = {
         id: (sessionResponse as any).exam_session_id,
@@ -319,13 +321,13 @@ export function ExamProvider({ children }: ExamProviderProps) {
         question: (sessionResponse as any).question,
         is_completed: false // Always false when starting
       }
-      
+
       setCurrentSession(examSession)
       console.log('✅ Exam session created and stored:', examSession)
       return true
     } catch (err) {
       console.error('Failed to start exam:', err)
-      
+
       // Extract meaningful error message
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
       setError(`Failed to start exam session: ${errorMessage}`)
@@ -342,9 +344,9 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const sessionData = await examAPI.getExamSession(sessionId)
-      
+
       // Convert API response to ExamSession format
       const examSession: ExamSession = {
         id: (sessionData as any).exam_session_id,
@@ -358,7 +360,7 @@ export function ExamProvider({ children }: ExamProviderProps) {
         question: (sessionData as any).question,
         is_completed: (sessionData as any).is_completed
       }
-      
+
       setCurrentSession(examSession)
       console.log('✅ Exam session loaded successfully:', examSession)
       return true
@@ -383,9 +385,9 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const response = await examAPI.submitAnswer(currentSession.id, answer)
-      
+
       // Update session with response data
       setCurrentSession(prev => prev ? {
         ...prev,
@@ -395,7 +397,7 @@ export function ExamProvider({ children }: ExamProviderProps) {
         is_completed: response.is_exam_completed,
         status: response.is_exam_completed ? 'completed' : 'in_progress'
       } : null)
-      
+
       return true
     } catch (err) {
       console.error('Failed to submit answer:', err)
@@ -418,16 +420,16 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       await examAPI.completeExamSession(currentSession.id)
       const scoreReport = await examAPI.getScoreReport(currentSession.id)
-      
+
       setCurrentSession(prev => prev ? {
         ...prev,
         status: 'completed',
         is_completed: true
       } : null)
-      
+
       return scoreReport
     } catch (err) {
       console.error('Failed to complete exam:', err)
@@ -445,7 +447,7 @@ export function ExamProvider({ children }: ExamProviderProps) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const scoreReport = await examAPI.getScoreReport(sessionId)
       return scoreReport
     } catch (err) {
@@ -511,11 +513,11 @@ export function ExamProvider({ children }: ExamProviderProps) {
  */
 export function useExamContext(): ExamContextType {
   const context = useContext(ExamContext)
-  
+
   if (context === undefined) {
     throw new Error('useExamContext must be used within an ExamProvider')
   }
-  
+
   return context
 }
 

@@ -38,7 +38,8 @@ def get_openai_client():
 
 def create_question_generation_prompt(content: str, num_questions: int, 
                                     question_types: List[QuestionType], 
-                                    difficulty_level: int, subject: str) -> str:
+                                    difficulty_level: int, subject: str,
+                                    document_type: str = "study_material") -> str:
     """
     Create a comprehensive prompt for OpenAI question generation.
     
@@ -46,11 +47,12 @@ def create_question_generation_prompt(content: str, num_questions: int,
     to generate questions based on the provided content and parameters.
     
     Args:
-        content: The study material content
+        content: The content from the uploaded material
         num_questions: Number of questions to generate
         question_types: Types of questions to generate
         difficulty_level: Difficulty level (1-5)
         subject: Academic subject
+        document_type: Type of document (study_material, assignment, thesis, paper)
         
     Returns:
         str: Complete prompt for OpenAI API
@@ -62,6 +64,15 @@ def create_question_generation_prompt(content: str, num_questions: int,
         4: "Hard (evaluation and complex application)",
         5: "Very Hard (advanced critical thinking and integration)"
     }
+    
+    # Map document types to readable labels
+    document_type_labels = {
+        "study_material": "study material",
+        "assignment": "assignment",
+        "thesis": "thesis",
+        "paper": "academic paper"
+    }
+    content_label = document_type_labels.get(document_type, "content")
     
     types_description = []
     for qtype in question_types:
@@ -83,20 +94,20 @@ You are an expert academic examiner creating questions for a {subject} exam.
 
 Question types to include: {', '.join(types_description)}
 
-STUDY MATERIAL:
+{content_label.upper()}:
 {content}
 
 🔢 COUNT VERIFICATION: Before responding, count your questions to ensure you have exactly {num_questions} items in the JSON array.
 
 REQUIREMENTS:
 1. ✅ EXACTLY {num_questions} questions (count them!)
-2. Questions must be directly related to the provided material
+2. Questions must be directly related to the provided {content_label}
 3. Each question should test understanding of key concepts
 4. Provide clear, unambiguous questions
 5. For multiple choice: include exactly 4 options with only one correct answer
 6. For all question types: provide a comprehensive explanation of the correct answer
 7. The questions are all short essay questions.
-8. Ensure questions test different aspects of the material (facts, concepts, applications)
+8. Ensure questions test different aspects of the {content_label} (facts, concepts, applications)
 
 OUTPUT FORMAT (JSON):
 {{
@@ -122,13 +133,13 @@ Generate exactly {num_questions} questions now:
 
 async def generate_questions_with_openai(material: MaterialDB, request: QuestionRequest) -> List[Question]:
     """
-    Generate questions using OpenAI API based on study material.
+    Generate questions using OpenAI API based on uploaded content.
     
     This function sends a request to OpenAI API to generate questions
     based on the provided material and converts the response to Question objects.
     
     Args:
-        material: The study material from database
+        material: The uploaded material from database
         request: Question generation request parameters
         
     Returns:
@@ -144,7 +155,8 @@ async def generate_questions_with_openai(material: MaterialDB, request: Question
             num_questions=request.num_questions,
             question_types=request.question_types,
             difficulty_level=request.difficulty_level,
-            subject=material.subject
+            subject=material.subject,
+            document_type=material.document_type
         )
         
         # Call OpenAI API with gpt-4o-mini for better performance and larger context
@@ -153,7 +165,7 @@ async def generate_questions_with_openai(material: MaterialDB, request: Question
             messages=[
                 {
                     "role": "system", 
-                    "content": "You are an expert academic examiner. Generate high-quality exam questions based on study materials."
+                    "content": "You are an expert academic examiner. Generate high-quality exam questions based on uploaded content."
                 },
                 {"role": "user", "content": prompt}
             ],
@@ -279,7 +291,7 @@ async def generate_questions(
     """
     Generate questions from uploaded material using OpenAI API.
     
-    This endpoint generates questions based on study material,
+    This endpoint generates questions based on uploaded material,
     saves them to the database and creates a text file export.
     
     Args:

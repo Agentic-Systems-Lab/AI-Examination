@@ -39,7 +39,7 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('API Response Error:', error.response?.data || error.message)
-    
+
     // Handle specific error cases
     if (error.response?.status === 401) {
       // Handle authentication errors
@@ -48,7 +48,7 @@ api.interceptors.response.use(
       // Handle server errors
       console.error('Server error occurred')
     }
-    
+
     return Promise.reject(error)
   }
 )
@@ -96,13 +96,17 @@ export async function uploadMaterial(
   file: File,
   title: string,
   description: string = '',
-  subject: string
+  subject: string,
+  documentType: string,
+  email: string
 ): Promise<Material> {
   const formData = new FormData()
   formData.append('file', file)
   formData.append('title', title)
   formData.append('description', description)
   formData.append('subject', subject)
+  formData.append('document_type', documentType)
+  formData.append('email', email)
 
   const response = await api.post('/upload/material', formData, {
     headers: {
@@ -238,7 +242,7 @@ export async function deleteQuestion(questionId: number): Promise<{ message: str
  * Create a new question for a specific material
  */
 export async function createQuestion(
-  materialId: number, 
+  materialId: number,
   questionData: Omit<Question, 'id'>
 ): Promise<{
   message: string
@@ -447,12 +451,20 @@ export async function getExamHistory(
  * Submit survey feedback
  */
 export async function submitSurvey(data: {
-    fairness_rating: number
-    ai_accuracy_rating: number
-    comments: string
-    session_id?: number
-    question_number?: number
-}): Promise<{ status: string, message: string }> {
+  fairness_rating: number
+  ai_accuracy_rating: number
+  comments: string
+  session_id?: number
+  question_number?: number
+  email?: string
+} | Array<{
+  fairness_rating: number
+  ai_accuracy_rating: number
+  comments: string
+  session_id?: number
+  question_number?: number
+  email?: string
+}>): Promise<{ status: string, message: string }> {
   const response = await api.post('/survey/', data)
   return response.data
 }
@@ -466,23 +478,23 @@ export function getErrorMessage(error: any): string {
   if (error.response?.data?.detail) {
     return error.response.data.detail
   }
-  
+
   if (error.response?.status === 404) {
     return 'The requested resource was not found.'
   }
-  
+
   if (error.response?.status === 400) {
     return 'Invalid request. Please check your input and try again.'
   }
-  
+
   if (error.response?.status >= 500) {
     return 'Server error. Please try again later.'
   }
-  
+
   if (error.code === 'NETWORK_ERROR') {
     return 'Network error. Please check your connection.'
   }
-  
+
   return 'An unexpected error occurred. Please try again.'
 }
 
@@ -491,11 +503,11 @@ export function getErrorMessage(error: any): string {
  */
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 Bytes'
-  
+
   const k = 1024
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
@@ -509,7 +521,7 @@ export function isValidFileType(file: File): boolean {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/msword'
   ]
-  
+
   return validTypes.includes(file.type)
 }
 
@@ -523,6 +535,6 @@ export function getFileTypeDisplayName(fileType: string): string {
     '.docx': 'Word Document',
     '.doc': 'Word Document (Legacy)'
   }
-  
+
   return typeMap[fileType] || fileType.toUpperCase()
 } 

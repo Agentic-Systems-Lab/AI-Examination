@@ -46,6 +46,8 @@ class MaterialUpload(BaseModel):
     title: str = Field(..., min_length=1, max_length=200, description="Title of the material")
     description: Optional[str] = Field(None, max_length=1000, description="Description of the material")
     subject: str = Field(..., min_length=1, max_length=100, description="Academic subject")
+    document_type: str = Field(..., description="Type of document (study_material, assignment, thesis, paper)")
+    student_email: str = Field(..., description="Student email address")
 
 class QuestionRequest(BaseModel):
     """
@@ -171,6 +173,8 @@ class MaterialDB(Base):
     title = Column(String(200), nullable=False)
     description = Column(Text)
     subject = Column(String(100), nullable=False)
+    document_type = Column(String(50), nullable=False, server_default="study_material")
+    student_email = Column(String(200), nullable=True)
     file_path = Column(String(500), nullable=False)
     file_type = Column(String(50), nullable=False)
     content_text = Column(Text)  # Extracted text content
@@ -206,6 +210,7 @@ class ExamSessionDB(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     material_id = Column(Integer, nullable=False)  # Foreign key to materials
+    student_email = Column(String(200), nullable=True)  # Student email from material
     status = Column(String(50), nullable=False, default="started")
     current_question = Column(Integer, default=0)
     questions_data = Column(JSON)  # Serialized questions list
