@@ -58,5 +58,65 @@
     "comments": "",
     "email": "pbertrand@ethz.ch",
     "survey_type": "exam"
+  },
+  {
+    "timestamp": "2025-12-02T16:52:16.540282",
+    "session_id": 3,
+    "question_number": null,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "",
+    "email": "pbertrand@ethz.ch",
+    "survey_type": "exam"
+  },
+  {
+    "timestamp": "2025-12-02T16:52:16.540301",
+    "session_id": 3,
+    "question_number": 1,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 4,
+    "comments": "",
+    "email": "pbertrand@ethz.ch",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-02T16:52:16.540308",
+    "session_id": 3,
+    "question_number": 2,
+    "fairness_rating": 4,
+    "ai_accuracy_rating": 4,
+    "comments": "",
+    "email": "pbertrand@ethz.ch",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-02T16:52:16.540312",
+    "session_id": 3,
+    "question_number": 3,
+    "fairness_rating": 4,
+    "ai_accuracy_rating": 4,
+    "comments": "",
+    "email": "pbertrand@ethz.ch",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-02T16:52:16.540316",
+    "session_id": 3,
+    "question_number": 4,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "",
+    "email": "pbertrand@ethz.ch",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-02T16:52:16.540319",
+    "session_id": 3,
+    "question_number": 5,
+    "fairness_rating": 4,
+    "ai_accuracy_rating": 5,
+    "comments": "",
+    "email": "pbertrand@ethz.ch",
+    "survey_type": "question"
   }
 ]
