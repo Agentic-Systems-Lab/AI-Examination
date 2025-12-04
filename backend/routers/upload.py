@@ -177,6 +177,7 @@ async def upload_material(
     subject: str = Form(...),
     document_type: str = Form(...),
     email: str = Form(...),
+    legi_number: str = Form(...),
     db: Session = Depends(get_database_session)
 ):
     """
@@ -239,6 +240,7 @@ async def upload_material(
             subject=subject,
             document_type=document_type,
             student_email=email,
+            legi_number=legi_number,
             file_path=file_path,
             file_type=file_extension,
             content_text=text_content

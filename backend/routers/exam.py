@@ -116,6 +116,7 @@ async def start_exam_session(
         exam_session = ExamSessionDB(
             material_id=request.material_id,
             student_email=material.student_email,
+            legi_number=getattr(material, "legi_number", None),
             status=ExamStatus.STARTED.value,
             current_question=0,
             questions_data=[q.dict() for q in questions],

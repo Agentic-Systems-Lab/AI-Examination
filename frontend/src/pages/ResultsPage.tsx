@@ -52,6 +52,7 @@ function ResultsPage() {
   const [isSubmittingSurvey, setIsSubmittingSurvey] = useState(false)
   const [surveySubmitted, setSurveySubmitted] = useState(false)
   const [studentEmail, setStudentEmail] = useState<string | null>(null)
+  const [legiNumber, setLegiNumber] = useState<string | null>(null)
 
   // Per-Question Survey State
   const [questionSurveys, setQuestionSurveys] = useState<{
@@ -107,9 +108,12 @@ function ResultsPage() {
           questionDetails: scoreReport.question_details || []
         })
 
-        // Store student email for survey submission
+        // Store student email and Legi-Number for survey submission
         if (scoreReport.student_email) {
           setStudentEmail(scoreReport.student_email)
+        }
+        if ((scoreReport as any).legi_number) {
+          setLegiNumber((scoreReport as any).legi_number)
         }
       } catch (err) {
         setError('Failed to load exam results: ' + (err instanceof Error ? err.message : 'Unknown error'))
@@ -126,29 +130,65 @@ function ResultsPage() {
     e.preventDefault()
     if (!sessionId) return
 
+    // Frontend guard: ensure all required overall survey fields are filled
+    if (
+      fairness === 0 ||
+      aiAccuracy === 0 ||
+      !comments.trim() ||
+      !studentEmail ||
+      !legiNumber
+    ) {
+      toast.error('Please fill in all required survey fields before submitting.')
+      return
+    }
+
+    // Frontend guard: ensure all per-question survey fields are filled
+    if (results?.questionDetails && results.questionDetails.length > 0) {
+      const incompleteQuestions = results.questionDetails.filter((q) => {
+        const survey = questionSurveys[q.question_number]
+        return !survey ||
+          survey.fairness <= 0 ||
+          survey.aiAccuracy <= 0 ||
+          !survey.comments ||
+          survey.comments.trim().length === 0
+      })
+
+      if (incompleteQuestions.length > 0) {
+        toast.error('Please provide feedback (fairness, AI assessment, and comments) for every question before submitting.')
+        return
+      }
+    }
+
     setIsSubmittingSurvey(true)
     try {
       const surveysToSubmit = []
 
-      // Add overall survey
+      // Add overall survey (all fields mandatory)
       surveysToSubmit.push({
         fairness_rating: fairness,
         ai_accuracy_rating: aiAccuracy,
-        comments,
+        comments: comments.trim(),
         session_id: parseInt(sessionId),
-        email: studentEmail || undefined
+        email: studentEmail,
+        legi_number: legiNumber
       })
 
-      // Add unsubmitted question surveys
+      // Add unsubmitted question surveys (all question feedback fields mandatory)
       Object.entries(questionSurveys).forEach(([qNum, survey]) => {
-        if (!survey.submitted && survey.fairness > 0 && survey.aiAccuracy > 0) {
+        if (
+          !survey.submitted &&
+          survey.fairness > 0 &&
+          survey.aiAccuracy > 0 &&
+          survey.comments.trim().length > 0
+        ) {
           surveysToSubmit.push({
             fairness_rating: survey.fairness,
             ai_accuracy_rating: survey.aiAccuracy,
-            comments: survey.comments,
+            comments: survey.comments.trim(),
             session_id: parseInt(sessionId),
             question_number: parseInt(qNum),
-            email: studentEmail || undefined
+            email: studentEmail,
+            legi_number: legiNumber
           })
         }
       })
@@ -160,7 +200,7 @@ function ResultsPage() {
       setQuestionSurveys(prev => {
         const next = { ...prev }
         Object.keys(next).forEach(key => {
-          if (next[parseInt(key)].fairness > 0) {
+          if (next[parseInt(key)].fairness > 0 && next[parseInt(key)].comments.trim().length > 0) {
             next[parseInt(key)].submitted = true
           }
         })
@@ -254,9 +294,7 @@ function ResultsPage() {
                     key={index}
                     className={`border rounded-lg p-6 ${isUnanswered
                       ? 'border-gray-300 bg-gray-50'
-                      : question.is_correct
-                        ? 'border-green-200 bg-green-50'
-                        : 'border-red-200 bg-red-50'
+                      : 'border-gray-200 bg-white'
                       }`}
                   >
                     {/* Question Header */}
@@ -265,14 +303,6 @@ function ResultsPage() {
                         Question {question.question_number}
                       </h3>
                       <div className="flex items-center gap-3">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${isUnanswered
-                          ? 'bg-gray-200 text-gray-700'
-                          : question.is_correct
-                            ? 'bg-green-200 text-green-800'
-                            : 'bg-red-200 text-red-800'
-                          }`}>
-                          {isUnanswered ? '⊘ Not Answered' : question.is_correct ? '✓ Correct' : '✗ Incorrect'}
-                        </span>
                         <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-200 text-blue-800">
                           Score: {question.score.toFixed(1)}/10
                         </span>
@@ -361,14 +391,14 @@ function ResultsPage() {
 
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-2">
-                            Comments (optional)
+                            Comments *
                           </label>
                           <textarea
                             rows={2}
                             className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                             value={questionSurveys[question.question_number]?.comments || ''}
                             onChange={(e) => updateQuestionSurvey(question.question_number, 'comments', e.target.value)}
-                            placeholder="Share your thoughts about this question..."
+                            placeholder="Share your thoughts about this question (required)..."
                           />
                         </div>
                       </div>
@@ -441,8 +471,8 @@ function ResultsPage() {
               </div>
 
               <div>
-                <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional Comments
+                  <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional Comments *
                 </label>
                 <textarea
                   id="comments"
@@ -450,13 +480,27 @@ function ResultsPage() {
                   className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
-                  placeholder="Share your thoughts..."
+                  placeholder="Share your thoughts (required)..."
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmittingSurvey || fairness === 0 || aiAccuracy === 0}
+                disabled={
+                  isSubmittingSurvey ||
+                  fairness === 0 ||
+                  aiAccuracy === 0 ||
+                  !comments.trim() ||
+                  (results?.questionDetails &&
+                    results.questionDetails.some((q) => {
+                      const survey = questionSurveys[q.question_number]
+                      return !survey ||
+                        survey.fairness <= 0 ||
+                        survey.aiAccuracy <= 0 ||
+                        !survey.comments ||
+                        survey.comments.trim().length === 0
+                    }))
+                }
                 className="w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmittingSurvey ? 'Submitting...' : 'Submit Feedback'}

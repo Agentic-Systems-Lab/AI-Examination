@@ -98,7 +98,8 @@ export async function uploadMaterial(
   description: string = '',
   subject: string,
   documentType: string,
-  email: string
+  email: string,
+  legiNumber: string
 ): Promise<Material> {
   const formData = new FormData()
   formData.append('file', file)
@@ -107,6 +108,7 @@ export async function uploadMaterial(
   formData.append('subject', subject)
   formData.append('document_type', documentType)
   formData.append('email', email)
+  formData.append('legi_number', legiNumber)
 
   const response = await api.post('/upload/material', formData, {
     headers: {
@@ -457,6 +459,7 @@ export async function submitSurvey(data: {
   session_id?: number
   question_number?: number
   email?: string
+  legi_number?: string
 } | Array<{
   fairness_rating: number
   ai_accuracy_rating: number
@@ -464,6 +467,7 @@ export async function submitSurvey(data: {
   session_id?: number
   question_number?: number
   email?: string
+  legi_number?: string
 }>): Promise<{ status: string, message: string }> {
   const response = await api.post('/survey/', data)
   return response.data

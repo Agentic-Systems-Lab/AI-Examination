@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import json
 import os
 from datetime import datetime
@@ -8,13 +8,30 @@ router = APIRouter()
 
 from typing import Optional
 
+
 class SurveyResponse(BaseModel):
-    fairness_rating: int
-    ai_accuracy_rating: int
-    comments: str
+    """
+    Survey response model.
+
+    All visible survey fields are required:
+      - fairness_rating
+      - ai_accuracy_rating
+      - comments (must be non-empty)
+
+    Optional metadata fields are:
+      - session_id
+      - question_number
+      - email
+      - legi_number
+    """
+
+    fairness_rating: int = Field(..., ge=1, le=5)
+    ai_accuracy_rating: int = Field(..., ge=1, le=5)
+    comments: str = Field(..., min_length=1)
     session_id: Optional[int] = None
     question_number: Optional[int] = None  # Optional: for per-question surveys
     email: Optional[str] = None  # Student email
+    legi_number: Optional[str] = None  # Student Legi-Number
 
 SURVEY_FILE = "survey_results.json"
 
@@ -41,6 +58,7 @@ async def submit_survey(response: Union[SurveyResponse, List[SurveyResponse]]):
                 "ai_accuracy_rating": resp.ai_accuracy_rating,
                 "comments": resp.comments,
                 "email": resp.email,
+                "legi_number": resp.legi_number,
                 "survey_type": "question" if resp.question_number is not None else "exam"
             }
             new_entries.append(entry)

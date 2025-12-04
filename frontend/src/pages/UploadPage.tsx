@@ -27,6 +27,7 @@ function UploadPage() {
     subject: '',
     documentType: 'study_material',
     email: '',
+    legiNumber: '',
     file: null as File | null
   })
 
@@ -71,7 +72,13 @@ function UploadPage() {
 
   // Handle file upload
   const handleUpload = async () => {
-    if (!uploadForm.file || !uploadForm.title.trim() || !uploadForm.subject.trim() || !uploadForm.email.trim()) {
+    if (
+      !uploadForm.file ||
+      !uploadForm.title.trim() ||
+      !uploadForm.subject.trim() ||
+      !uploadForm.email.trim() ||
+      !uploadForm.legiNumber.trim()
+    ) {
       toast.error('Please fill in all required fields and select a file.')
       return
     }
@@ -92,7 +99,8 @@ function UploadPage() {
         uploadForm.description.trim(),
         uploadForm.subject.trim(),
         uploadForm.documentType,
-        uploadForm.email.trim()
+        uploadForm.email.trim(),
+        uploadForm.legiNumber.trim()
       )
 
       toast.success('Material uploaded successfully! Generating questions...')
@@ -273,6 +281,20 @@ function UploadPage() {
                 </div>
 
                 <div>
+                  <label htmlFor="legiNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                    Legi-Number *
+                  </label>
+                  <input
+                    type="text"
+                    id="legiNumber"
+                    className="input"
+                    placeholder="e.g., 12-345-678"
+                    value={uploadForm.legiNumber}
+                    onChange={(e) => handleInputChange('legiNumber', e.target.value)}
+                  />
+                </div>
+
+                <div>
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                     Description (Optional)
                   </label>
@@ -288,7 +310,15 @@ function UploadPage() {
 
                 <button
                   onClick={handleUpload}
-                  disabled={isUploading || isGeneratingQuestions || !uploadForm.file || !uploadForm.title.trim() || !uploadForm.subject.trim() || !uploadForm.email.trim()}
+                  disabled={
+                    isUploading ||
+                    isGeneratingQuestions ||
+                    !uploadForm.file ||
+                    !uploadForm.title.trim() ||
+                    !uploadForm.subject.trim() ||
+                    !uploadForm.email.trim() ||
+                    !uploadForm.legiNumber.trim()
+                  }
                   className="btn-primary w-full"
                 >
                   {isUploading || isGeneratingQuestions ? (

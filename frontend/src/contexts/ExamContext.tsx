@@ -56,6 +56,7 @@ export interface ExamSession {
 export interface ScoreReport {
   exam_session_id: number
   student_email?: string
+  legi_number?: string
   material_title: string
   material_subject: string
   exam_date: string | null
