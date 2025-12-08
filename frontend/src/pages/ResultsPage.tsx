@@ -283,7 +283,7 @@ function ResultsPage() {
         )}
 
         {/* Detailed Question Results */}
-        {results && results.questionDetails && results.questionDetails.length > 0 && (
+        {!surveySubmitted && results && results.questionDetails && results.questionDetails.length > 0 && (
           <div className="bg-white shadow rounded-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Question-by-Question Results</h2>
             <div className="space-y-6">
@@ -420,7 +420,7 @@ function ResultsPage() {
               <h3 className="text-xl font-semibold text-gray-900">Thank You!</h3>
               <p className="text-gray-500 mt-2">Your feedback has been recorded.</p>
               <button
-                onClick={() => navigate('/upload')}
+                onClick={() => navigate('/')}
                 className="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 Start New Exam
@@ -472,7 +472,7 @@ function ResultsPage() {
 
               <div>
                   <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional Comments *
+                  Overall Comments *
                 </label>
                 <textarea
                   id="comments"

@@ -118,5 +118,137 @@
     "comments": "",
     "email": "pbertrand@ethz.ch",
     "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:12:07.209158",
+    "session_id": 1,
+    "question_number": null,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "kjlk",
+    "email": "osul@llkj.com",
+    "legi_number": "12380948",
+    "survey_type": "exam"
+  },
+  {
+    "timestamp": "2025-12-08T17:12:07.209327",
+    "session_id": 1,
+    "question_number": 1,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "asdfa",
+    "email": "osul@llkj.com",
+    "legi_number": "12380948",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:12:07.209341",
+    "session_id": 1,
+    "question_number": 2,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "adsfa",
+    "email": "osul@llkj.com",
+    "legi_number": "12380948",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:12:07.209346",
+    "session_id": 1,
+    "question_number": 3,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "adsfa",
+    "email": "osul@llkj.com",
+    "legi_number": "12380948",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:12:07.209350",
+    "session_id": 1,
+    "question_number": 4,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "sadfa",
+    "email": "osul@llkj.com",
+    "legi_number": "12380948",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:12:07.209354",
+    "session_id": 1,
+    "question_number": 5,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "dfd",
+    "email": "osul@llkj.com",
+    "legi_number": "12380948",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:15:42.909892",
+    "session_id": 2,
+    "question_number": null,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "asdf",
+    "email": "osullkev@gmail.com",
+    "legi_number": "12349",
+    "survey_type": "exam"
+  },
+  {
+    "timestamp": "2025-12-08T17:15:42.909912",
+    "session_id": 2,
+    "question_number": 1,
+    "fairness_rating": 4,
+    "ai_accuracy_rating": 3,
+    "comments": "asdf",
+    "email": "osullkev@gmail.com",
+    "legi_number": "12349",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:15:42.909916",
+    "session_id": 2,
+    "question_number": 2,
+    "fairness_rating": 3,
+    "ai_accuracy_rating": 3,
+    "comments": "asdf",
+    "email": "osullkev@gmail.com",
+    "legi_number": "12349",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:15:42.909919",
+    "session_id": 2,
+    "question_number": 3,
+    "fairness_rating": 2,
+    "ai_accuracy_rating": 2,
+    "comments": "asdf",
+    "email": "osullkev@gmail.com",
+    "legi_number": "12349",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:15:42.909923",
+    "session_id": 2,
+    "question_number": 4,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 5,
+    "comments": "asdf",
+    "email": "osullkev@gmail.com",
+    "legi_number": "12349",
+    "survey_type": "question"
+  },
+  {
+    "timestamp": "2025-12-08T17:15:42.909927",
+    "session_id": 2,
+    "question_number": 5,
+    "fairness_rating": 5,
+    "ai_accuracy_rating": 4,
+    "comments": "asdf",
+    "email": "osullkev@gmail.com",
+    "legi_number": "12349",
+    "survey_type": "question"
   }
 ]

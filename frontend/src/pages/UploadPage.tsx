@@ -24,8 +24,8 @@ function UploadPage() {
   const [uploadForm, setUploadForm] = useState({
     title: '',
     description: '',
-    subject: '',
-    documentType: 'study_material',
+    subject: 'Digital Transformation',
+    documentType: 'assignment',
     email: '',
     legiNumber: '',
     file: null as File | null
@@ -46,7 +46,7 @@ function UploadPage() {
     setUploadForm(prev => ({
       ...prev,
       file,
-      title: prev.title || file.name.replace(/\.[^/.]+$/, '') // Auto-fill title from filename
+      // title: prev.title || file.name.replace(/\.[^/.]+$/, '') // Auto-fill title from filename
     }))
   }, [])
 
@@ -155,7 +155,7 @@ function UploadPage() {
       <div className="relative z-10 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
-          <div className="text-center mb-12 animate-slide-up">
+          {/* <div className="text-center mb-12 animate-slide-up">
             <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent mb-6">
               Study Materials
             </h1>
@@ -163,7 +163,7 @@ function UploadPage() {
               Upload and manage your study materials for AI-powered examinations.
               Supports PDF, DOCX, and TXT files up to 10MB.
             </p>
-          </div>
+          </div> */}
 
           <div className="max-w-2xl mx-auto">
             {/* Upload Section */}
@@ -212,7 +212,7 @@ function UploadPage() {
                         or click to browse files
                       </p>
                       <p className="text-xs text-gray-400 mt-2">
-                        Supports PDF, DOCX, TXT (max 10MB)
+                        Supports TXT (max 10MB)
                       </p>
                     </div>
                   )}
@@ -235,7 +235,7 @@ function UploadPage() {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
                     Subject *
                   </label>
@@ -247,9 +247,9 @@ function UploadPage() {
                     value={uploadForm.subject}
                     onChange={(e) => handleInputChange('subject', e.target.value)}
                   />
-                </div>
+                </div> */}
 
-                <div>
+                {/* <div>
                   <label htmlFor="documentType" className="block text-sm font-medium text-gray-700 mb-1">
                     Document Type *
                   </label>
@@ -264,7 +264,7 @@ function UploadPage() {
                     <option value="thesis">Thesis</option>
                     <option value="paper">Paper</option>
                   </select>
-                </div>
+                </div> */}
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -294,7 +294,7 @@ function UploadPage() {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                     Description (Optional)
                   </label>
@@ -306,7 +306,7 @@ function UploadPage() {
                     value={uploadForm.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                   />
-                </div>
+                </div> */}
 
                 <button
                   onClick={handleUpload}
