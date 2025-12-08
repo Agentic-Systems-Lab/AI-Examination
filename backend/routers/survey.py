@@ -64,20 +64,20 @@ async def submit_survey(response: Union[SurveyResponse, List[SurveyResponse]]):
             new_entries.append(entry)
         
         existing_data = []
-        if os.path.exists(SURVEY_FILE):
-            try:
-                with open(SURVEY_FILE, "r") as f:
-                    existing_data = json.load(f)
-            except json.JSONDecodeError:
-                existing_data = []
+        # if os.path.exists(SURVEY_FILE):
+        #     try:
+        #         with open(SURVEY_FILE, "r") as f:
+        #             existing_data = json.load(f)
+        #     except json.JSONDecodeError:
+        #         existing_data = []
         
-        if not isinstance(existing_data, list):
-            existing_data = []
+        # if not isinstance(existing_data, list):
+        #     existing_data = []
             
-        existing_data.extend(new_entries)
+        # existing_data.extend(new_entries)
         
-        with open(SURVEY_FILE, "w") as f:
-            json.dump(existing_data, f, indent=2)
+        with open(resp.legi_number+'.json', "w") as f:
+            json.dump(new_entries, f, indent=2)
             
         return {"status": "success", "message": f"{len(new_entries)} survey(s) submitted successfully"}
         
