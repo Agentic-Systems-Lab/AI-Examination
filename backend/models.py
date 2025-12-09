@@ -242,3 +242,24 @@ class AnswerDB(Base):
     score = Column(Float)  # Partial scoring for complex answers
     feedback = Column(Text)  # AI-generated feedback
     answer_time = Column(DateTime(timezone=True), server_default=func.now()) 
+
+
+class SurveyResponseDB(Base):
+    """
+    Database model for survey responses (overall exam + per-question).
+    
+    Stores user feedback instead of writing to a JSON file.
+    """
+
+    __tablename__ = "survey_responses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(Integer, nullable=True)
+    question_number = Column(Integer, nullable=True)  # Null for overall exam survey
+    fairness_rating = Column(Integer, nullable=False)
+    ai_accuracy_rating = Column(Integer, nullable=False)
+    comments = Column(Text, nullable=False)
+    email = Column(String(200), nullable=True)
+    legi_number = Column(String(100), nullable=True)
+    survey_type = Column(String(50), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

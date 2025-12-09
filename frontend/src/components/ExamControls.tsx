@@ -31,8 +31,6 @@ interface ExamControlsProps {
   onCompleteExam: () => void
   /** Callback to skip current question */
   onSkipQuestion?: () => void
-  /** Callback to restart exam */
-  onRestartExam?: () => void
   /** Disabled state */
   disabled?: boolean
 }
@@ -54,7 +52,6 @@ function ExamControls({
   onStartExam,
   onCompleteExam,
   onSkipQuestion,
-  onRestartExam,
   disabled = false
 }: ExamControlsProps) {
 
@@ -212,19 +209,6 @@ function ExamControls({
               <span>Complete Exam</span>
             </button>
           </>
-        )}
-
-        {examStatus === 'completed' && onRestartExam && (
-          <button
-            onClick={onRestartExam}
-            disabled={disabled}
-            className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 
-                     disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl 
-                     font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 backdrop-blur-sm border border-white/20"
-          >
-            <Play className="w-6 h-6" />
-            <span>Start New Exam</span>
-          </button>
         )}
       </div>
 

@@ -419,12 +419,6 @@ function ResultsPage() {
               <div className="text-green-500 text-5xl mb-4">✓</div>
               <h3 className="text-xl font-semibold text-gray-900">Thank You!</h3>
               <p className="text-gray-500 mt-2">Your feedback has been recorded.</p>
-              <button
-                onClick={() => navigate('/upload')}
-                className="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Start New Exam
-              </button>
             </div>
           ) : (
             <form onSubmit={handleSurveySubmit} className="space-y-6">

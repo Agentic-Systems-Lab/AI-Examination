@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from typing import List, Optional, Union
+
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-import json
-import os
-from datetime import datetime
+from sqlalchemy.orm import Session
+
+from database import get_database_session
+from models import SurveyResponseDB
 
 router = APIRouter()
-
-from typing import Optional
 
 
 class SurveyResponse(BaseModel):
@@ -33,54 +34,41 @@ class SurveyResponse(BaseModel):
     email: Optional[str] = None  # Student email
     legi_number: Optional[str] = None  # Student Legi-Number
 
-SURVEY_FILE = "survey_results.json"
-
-from typing import List, Union
-
 @router.post("/")
-async def submit_survey(response: Union[SurveyResponse, List[SurveyResponse]]):
+async def submit_survey(
+    response: Union[SurveyResponse, List[SurveyResponse]],
+    db: Session = Depends(get_database_session)
+):
     """
     Submit user feedback for the exam session.
-    Appends the feedback to a JSON file.
+
+    Persists the feedback to the database instead of a JSON file.
     Supports both single entry and batch submission.
     """
     try:
-        # Normalize input to list
         responses = response if isinstance(response, list) else [response]
-        
-        new_entries = []
+
         for resp in responses:
-            entry = {
-                "timestamp": datetime.now().isoformat(),
-                "session_id": resp.session_id,
-                "question_number": resp.question_number,  # None for overall exam survey
-                "fairness_rating": resp.fairness_rating,
-                "ai_accuracy_rating": resp.ai_accuracy_rating,
-                "comments": resp.comments,
-                "email": resp.email,
-                "legi_number": resp.legi_number,
-                "survey_type": "question" if resp.question_number is not None else "exam"
-            }
-            new_entries.append(entry)
-        
-        existing_data = []
-        if os.path.exists(SURVEY_FILE):
-            try:
-                with open(SURVEY_FILE, "r") as f:
-                    existing_data = json.load(f)
-            except json.JSONDecodeError:
-                existing_data = []
-        
-        if not isinstance(existing_data, list):
-            existing_data = []
-            
-        existing_data.extend(new_entries)
-        
-        with open(SURVEY_FILE, "w") as f:
-            json.dump(existing_data, f, indent=2)
-            
-        return {"status": "success", "message": f"{len(new_entries)} survey(s) submitted successfully"}
-        
+            survey_entry = SurveyResponseDB(
+                session_id=resp.session_id,
+                question_number=resp.question_number,
+                fairness_rating=resp.fairness_rating,
+                ai_accuracy_rating=resp.ai_accuracy_rating,
+                comments=resp.comments,
+                email=resp.email,
+                legi_number=resp.legi_number,
+                survey_type="question" if resp.question_number is not None else "exam",
+            )
+            db.add(survey_entry)
+
+        db.commit()
+
+        return {
+            "status": "success",
+            "message": f"{len(responses)} survey(s) submitted successfully",
+        }
+
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to save survey: {str(e)}")
 
