@@ -76,7 +76,7 @@ async def submit_survey(response: Union[SurveyResponse, List[SurveyResponse]]):
             
         # existing_data.extend(new_entries)
         
-        with open(resp.legi_number+'.json', "w") as f:
+        with open(str(resp.session_id)+'.json', "w") as f:
             json.dump(new_entries, f, indent=2)
             
         return {"status": "success", "message": f"{len(new_entries)} survey(s) submitted successfully"}

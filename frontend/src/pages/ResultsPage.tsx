@@ -51,8 +51,6 @@ function ResultsPage() {
   const [comments, setComments] = useState('')
   const [isSubmittingSurvey, setIsSubmittingSurvey] = useState(false)
   const [surveySubmitted, setSurveySubmitted] = useState(false)
-  const [studentEmail, setStudentEmail] = useState<string | null>(null)
-  const [legiNumber, setLegiNumber] = useState<string | null>(null)
 
   // Per-Question Survey State
   const [questionSurveys, setQuestionSurveys] = useState<{
@@ -97,23 +95,23 @@ function ResultsPage() {
         const finalScore = scoreReport.final_score || 0
         const grade = calculateGrade(finalScore)
 
-        setResults({
-          finalScore,
-          accuracy,
-          grade,
-          totalQuestions,
-          questionsAnswered,
-          correctAnswers,
-          materialTitle: scoreReport.material_title || 'Unknown Material',
-          questionDetails: scoreReport.question_details || []
-        })
+        const surveyAnswered = scoreReport.survey_answered
 
-        // Store student email and Legi-Number for survey submission
-        if (scoreReport.student_email) {
-          setStudentEmail(scoreReport.student_email)
+        if (surveyAnswered === true) {
+          setSurveySubmitted(true)
         }
-        if ((scoreReport as any).legi_number) {
-          setLegiNumber((scoreReport as any).legi_number)
+        else {
+
+          setResults({
+            finalScore,
+            accuracy,
+            grade,
+            totalQuestions,
+            questionsAnswered,
+            correctAnswers,
+            materialTitle: scoreReport.material_title || 'Unknown Material',
+            questionDetails: scoreReport.question_details || []
+          })
         }
       } catch (err) {
         setError('Failed to load exam results: ' + (err instanceof Error ? err.message : 'Unknown error'))
@@ -134,9 +132,7 @@ function ResultsPage() {
     if (
       fairness === 0 ||
       aiAccuracy === 0 ||
-      !comments.trim() ||
-      !studentEmail ||
-      !legiNumber
+      !comments.trim()
     ) {
       toast.error('Please fill in all required survey fields before submitting.')
       return
@@ -168,9 +164,7 @@ function ResultsPage() {
         fairness_rating: fairness,
         ai_accuracy_rating: aiAccuracy,
         comments: comments.trim(),
-        session_id: parseInt(sessionId),
-        email: studentEmail,
-        legi_number: legiNumber
+        session_id: parseInt(sessionId)
       })
 
       // Add unsubmitted question surveys (all question feedback fields mandatory)
@@ -186,9 +180,7 @@ function ResultsPage() {
             ai_accuracy_rating: survey.aiAccuracy,
             comments: survey.comments.trim(),
             session_id: parseInt(sessionId),
-            question_number: parseInt(qNum),
-            email: studentEmail,
-            legi_number: legiNumber
+            question_number: parseInt(qNum)
           })
         }
       })
@@ -248,7 +240,7 @@ function ResultsPage() {
       <div className="max-w-4xl mx-auto space-y-8">
 
         {/* Results Section */}
-        {results && (
+        {!surveySubmitted && results && (
           <div className="bg-white shadow rounded-lg p-8">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900">Exam Results</h1>
@@ -471,7 +463,7 @@ function ResultsPage() {
               </div>
 
               <div>
-                  <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
                   Overall Comments *
                 </label>
                 <textarea

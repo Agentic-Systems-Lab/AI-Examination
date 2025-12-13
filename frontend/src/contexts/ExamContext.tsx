@@ -55,6 +55,7 @@ export interface ExamSession {
 
 export interface ScoreReport {
   exam_session_id: number
+  survey_answered: boolean
   student_email?: string
   legi_number?: string
   material_title: string
@@ -324,7 +325,7 @@ export function ExamProvider({ children }: ExamProviderProps) {
       }
 
       setCurrentSession(examSession)
-      console.log('✅ Exam session created and stored:', examSession)
+      // console.log('✅ Exam session created and stored:', examSession)
       return true
     } catch (err) {
       console.error('Failed to start exam:', err)

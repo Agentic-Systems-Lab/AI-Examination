@@ -479,28 +479,39 @@ async def get_score_report(
                 "confidence_level": answer.get('confidence_level'),
                 "time_taken": answer.get('time_taken')
             })
+            
+        legi_number = getattr(session, "legi_number", None)        
+        survey_answered = os.path.exists((str(session_id)+'.json')) | os.path.exists((str(legi_number)+'.json'))
         
-        return {
-            "exam_session_id": session_id,
-            "material_title": material.title if material else "Unknown",
-            "material_subject": material.subject if material else "Unknown",
-            "exam_date": session.start_time.isoformat() if session.start_time else None,
-            "completion_time": session.end_time.isoformat() if session.end_time else None,
-            "final_score": session.final_score,
-            "score_breakdown": session.score_breakdown,
-            "performance_analysis": {
-                "strengths": ai_feedback["strengths"],
-                "weaknesses": ai_feedback["weaknesses"],
-                "recommendations": ai_feedback["recommendations"]
-            },
-            "question_details": question_details,
-            "summary": {
-                "total_questions": len(questions_data),
-                "questions_answered": len(answer_map),
-                "correct_answers": sum(1 for a in answer_map.values() if a.get('is_correct', False)),
-                "accuracy_percentage": round((sum(1 for a in answer_map.values() if a.get('is_correct', False)) / len(answer_map)) * 100, 1) if answer_map else 0
+        if survey_answered:
+            return {
+                "exam_session_id": session_id,
+                "survey_answered": survey_answered
+                }
+            
+        else:
+            return {
+                "exam_session_id": session_id,
+                "survey_answered": survey_answered,
+                "material_title": material.title if material else "Unknown",
+                "material_subject": material.subject if material else "Unknown",
+                "exam_date": session.start_time.isoformat() if session.start_time else None,
+                "completion_time": session.end_time.isoformat() if session.end_time else None,
+                "final_score": session.final_score,
+                "score_breakdown": session.score_breakdown,
+                "performance_analysis": {
+                    "strengths": ai_feedback["strengths"],
+                    "weaknesses": ai_feedback["weaknesses"],
+                    "recommendations": ai_feedback["recommendations"]
+                },
+                "question_details": question_details,
+                "summary": {
+                    "total_questions": len(questions_data),
+                    "questions_answered": len(answer_map),
+                    "correct_answers": sum(1 for a in answer_map.values() if a.get('is_correct', False)),
+                    "accuracy_percentage": round((sum(1 for a in answer_map.values() if a.get('is_correct', False)) / len(answer_map)) * 100, 1) if answer_map else 0
+                }
             }
-        }
         
     except HTTPException:
         raise
