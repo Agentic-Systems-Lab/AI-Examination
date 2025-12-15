@@ -119,7 +119,7 @@ interface ExamContextType {
   error: string | null
 
   // Actions
-  loadMaterials: () => Promise<void>
+  // loadMaterials: () => Promise<void>
   selectMaterial: (material: Material) => void
   deleteMaterial: (materialId: number) => Promise<boolean>
   generateQuestions: (materialId: number, options: {
@@ -170,27 +170,27 @@ export function ExamProvider({ children }: ExamProviderProps) {
   const isInExam = currentSession !== null && currentSession.status !== 'completed'
 
   // Load materials on mount
-  useEffect(() => {
-    loadMaterials()
-  }, [])
+  // useEffect(() => {
+  //   loadMaterials()
+  // }, [])
 
-  /**
-   * Load available study materials
-   */
-  const loadMaterials = async (): Promise<void> => {
-    try {
-      setIsLoading(true)
-      setError(null)
+  // /**
+  //  * Load available study materials
+  //  */
+  // const loadMaterials = async (): Promise<void> => {
+  //   try {
+  //     setIsLoading(true)
+  //     setError(null)
 
-      const response = await examAPI.getMaterials()
-      setMaterials(response.materials || [])
-    } catch (err) {
-      console.error('Failed to load materials:', err)
-      setError('Failed to load study materials')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  //     const response = await examAPI.getMaterials()
+  //     setMaterials(response.materials || [])
+  //   } catch (err) {
+  //     console.error('Failed to load materials:', err)
+  //     setError('Failed to load study materials')
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   /**
    * Select a material for examination
@@ -487,7 +487,7 @@ export function ExamProvider({ children }: ExamProviderProps) {
     isLoading,
     isGeneratingQuestions,
     error,
-    loadMaterials,
+    // loadMaterials,
     selectMaterial,
     deleteMaterial,
     generateQuestions,
